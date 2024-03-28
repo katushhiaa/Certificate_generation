@@ -1,26 +1,25 @@
 <template>
     <div id="app">
-      <nav class="navbar navbar-expand navbar-light fixed-top">
-        <div class="container">
-          <a href="#" class="navbar-brand">Home</a>
-          <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ml-auto">
-              <li class="nav-item">
-                <a href="#" class="nav-link">Login</a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">Sign-up</a>
-              </li>
-            </ul>
-          </div>
+     <navComp/>
+      <div class="auth-wrapper">
+        <div class="auth-inner">
+          <login></login>
         </div>
-      </nav>
+      </div>
     </div>
 </template>
 
 <script>
+import Login from './components/Login.vue'
+
+import navComp from './components/NavComp.vue'
+
 export default{
-  name: 'App'
+  name: 'App',
+  components:{
+    navComp,
+    Login
+  }
 }
 </script>
 
@@ -65,9 +64,11 @@ export default{
   }
 
   .auth-inner {
-    width: 450px;
+    width: 100%;
+    min-width: 450px;
     margin: auto;
     background-color: #FFFFFF;
+    color:  #000000;
     box-shadow: 0px 14px 80px rgba(34,35,58,0.2);
     padding: 40px 55px 45px 55px;
     border-radius: 15px;
