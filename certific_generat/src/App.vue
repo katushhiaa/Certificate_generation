@@ -102,6 +102,9 @@ export default{
     color: #167BFF;
   }
 
+  label {
+    padding: 8px 0;
+  }
 
 
 </style>
