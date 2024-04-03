@@ -3,14 +3,13 @@
      <navComp/>
       <div class="auth-wrapper">
         <div class="auth-inner">
-          <login></login>
+          <router-view></router-view>
         </div>
       </div>
     </div>
 </template>
 
 <script>
-import Login from './components/Login.vue'
 
 import navComp from './components/NavComp.vue'
 
@@ -18,7 +17,6 @@ export default{
   name: 'App',
   components:{
     navComp,
-    Login
   }
 }
 </script>
