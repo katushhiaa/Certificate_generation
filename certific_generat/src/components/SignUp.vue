@@ -41,25 +41,22 @@
         },
 
         methods: {
-            handleSubmit(){
+            handleSubmit() {
                 const data = {
-                    first_name: this.first_name,
-                    last_name: this.last_name,
+                    first_name: this.firstName,
+                    last_name: this.lastName,
                     email: this.email,
                     password: this.password,
-                    password_confirmed: this.password_confirmed
+                    password_confirmed: this.passwordConfirmed
                 };
                 
                 axios.post('http://localhost:5173/signup', data)
-                    .then(
-                        res => {
-                            console.log(res);
-                        }
-                    ).catch(
-                        err => {
-                            console.log(err);
-                        }
-                    )
+                    .then(res => {
+                        console.log(res);
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
             }
         }
     }
