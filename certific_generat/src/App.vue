@@ -22,7 +22,6 @@ export default{
 </script>
 
 <style>
-
   * {
     box-sizing: border-box;
   }
@@ -35,14 +34,14 @@ export default{
     font-family: system-ui;
   }
 
-  h1, h2, h3, h4, h5,h6, label, span {
-      font-weight: 500;
-      font-family: system-ui;
+  h1, h2, h3, h4, h5, h6, label, span {
+    font-weight: 500;
+    font-family: system-ui;
   }
 
   body, html, #app, #root, .auth-wrapper {
-      width: 100%;
-      height: 100%;
+    width: 100%;
+    height: 100%;
   }
 
   #app {
@@ -51,24 +50,25 @@ export default{
 
   .navbar-light {
     background-color: #FFFFFF;
-    box-shadow: 0px 14px 80px rgba(34,35,58,0.2);
+    box-shadow: 0px 14px 80px rgba(34, 35, 58, 0.2);
   }
 
   .auth-wrapper {
     display: flex;
     justify-content: center;
+    align-items: center;
     flex-direction: column;
     text-align: left;
   }
 
   .auth-inner {
     width: 100%;
-    min-width: 450px;
+    max-width: 450px;
     margin: auto;
     background-color: #FFFFFF;
-    color:  #000000;
-    box-shadow: 0px 14px 80px rgba(34,35,58,0.2);
-    padding: 40px 55px 45px 55px;
+    color: #000000;
+    box-shadow: 0px 14px 80px rgba(34, 35, 58, 0.2);
+    padding: 40px 5% 45px 5%;
     border-radius: 15px;
     transition: all .3s;
   }
@@ -90,7 +90,7 @@ export default{
   }
 
   .forgot-password,
-  .forgot-password a{
+  .forgot-password a {
     text-align: right;
     font-size: 13px;
     padding-top: 10px;
@@ -98,7 +98,7 @@ export default{
     margin: 0;
   }
 
-  .forgot-password a{
+  .forgot-password a {
     color: #167BFF;
   }
 
@@ -106,5 +106,7 @@ export default{
     padding: 8px 0;
   }
 
-
+  .form-checkbox {
+    margin: 10px 10px 0px 10px;
+  }
 </style>
