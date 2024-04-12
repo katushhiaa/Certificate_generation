@@ -19,94 +19,150 @@ export default{
     navComp,
   }
 }
+
+/*const { MongoClient } = require("mongodb");
+
+const url = "mongodb://localhost:27017";
+const client = new MongoClient(url);
+const dbName = "database";
+
+async function dbConnect() {
+  await client.connect();
+  const db = client.db(dbName);
+  return db;
+}
+module.exports = dbConnect;*/
 </script>
 
 <style>
-  * {
-    box-sizing: border-box;
-  }
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+body{
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #4070f4;
+}
+.wrapper {
+  position: relative;
+  width: 90%; 
+  margin: 0 auto; 
+  background: #fff;
+  padding: 34px;
+  border-radius: 6px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
 
-  body {
-    background: #1C8EF9 !important;
-    min-height: 100vh;
-    display: flex;
-    font-weight: 400;
-    font-family: system-ui;
+@media screen and (min-width: 768px) { 
+  .wrapper {
+    width: 430px; 
   }
+}
+.wrapper h2{
+  position: relative;
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+}
+.wrapper h2::before{
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 28px;
+  border-radius: 12px;
+  background: #4070f4;
+}
+.wrapper form{
+  margin-top: 30px;
+}
+.wrapper form .input-box{
+  height: 52px;
+  margin: 18px 0;
+}
+form .input-box input{
+  height: 100%;
+  width: 100%;
+  outline: none;
+  padding: 0 15px;
+  font-size: 17px;
+  font-weight: 400;
+  color: #333;
+  border: 1.5px solid #C7BEBE;
+  border-bottom-width: 2.5px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+.input-box input:focus,
+.input-box input:valid{
+  border-color: #4070f4;
+}
+form h3{
+  color: #707070;
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 10px;
+}
+.input-box.button input{
+  color: #fff;
+  letter-spacing: 1px;
+  border: none;
+  background: #4070f4;
+  cursor: pointer;
+}
+.input-box.button input:hover{
+  background: #0e4bf1;
+}
 
-  h1, h2, h3, h4, h5, h6, label, span {
-    font-weight: 500;
-    font-family: system-ui;
-  }
+.input-box.button button {
+  height: 100%;
+  width: 100%;
+  outline: none;
+  padding: 0 15px;
+  font-size: 17px;
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  background: #4070f4;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
 
-  body, html, #app, #root, .auth-wrapper {
-    width: 100%;
-    height: 100%;
-  }
+.input-box.button button:hover {
+  background: #0e4bf1;
+}
 
-  #app {
-    text-align: center;
-  }
+form .text h3{
+ color: #333;
+ width: 100%;
+ text-align: center;
+}
+form .text h3 a{
+  color: #4070f4;
+  text-decoration: none;
+}
+form .text h3 a:hover{
+  text-decoration: underline;
+}
 
-  .navbar-light {
-    background-color: #FFFFFF;
-    box-shadow: 0px 14px 80px rgba(34, 35, 58, 0.2);
-  }
+label {
+  padding: 8px 0;
+}
 
-  .auth-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    text-align: left;
-  }
+.role-selection {
+  margin-bottom: 15px;
+  color: #000000;
+}
 
-  .auth-inner {
-    width: 100%;
-    max-width: 450px;
-    margin: auto;
-    background-color: #FFFFFF;
-    color: #000000;
-    box-shadow: 0px 14px 80px rgba(34, 35, 58, 0.2);
-    padding: 40px 5% 45px 5%;
-    border-radius: 15px;
-    transition: all .3s;
-  }
-
-  .auth-wrapper .form-control:focus {
-    border-color: #167BFF;
-    box-shadow: none;
-  }
-
-  .auth-wrapper h3 {
-    text-align: center;
-    margin: 0;
-    line-height: 1;
-    padding-bottom: 20px;
-  }
-
-  .custom-control-label {
-    font-weight: 400;
-  }
-
-  .forgot-password,
-  .forgot-password a {
-    text-align: right;
-    font-size: 13px;
-    padding-top: 10px;
-    color: #7F7D7D;
-    margin: 0;
-  }
-
-  .forgot-password a {
-    color: #167BFF;
-  }
-
-  label {
-    padding: 8px 0;
-  }
-
-  .form-checkbox {
-    margin: 10px 10px 0px 10px;
-  }
+.role-selection input[type="radio"] {
+  margin: 5px;
+}
 </style>

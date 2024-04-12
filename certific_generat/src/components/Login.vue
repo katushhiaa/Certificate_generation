@@ -1,26 +1,41 @@
 <template>
-    <form>
-        <h3>Login</h3>
+    <div class="wrapper">
+        <h2>Увійти</h2>
+        <form name="login-form">
+            <div class="auth-inner">
+                <div class="input-box">
+                    <input type="text" v-model="name" placeholder="Введіть свій логін" required>
+                </div>
 
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" class="form-control" placeholder="Email"/>
-            <label>Password</label>
-            <input type="password" class="form-control" placeholder="Password">
-        </div>
+                <div class="input-box">
+                    <input type="password" v-model="password" placeholder="Введіть пароль" required>
+                </div>
 
-        <button class="btn btn-primary btn-block">Login</button>
-    </form>
+                <div class="role-selection">
+                    <input type="radio" id="teacher" v-model="role" value="teacher" class="form-radio"/>
+                    <label for="teacher"> Я викладач</label>
+            
+                    <input type="radio" id="student" v-model="role" value="student" class="text"/>
+                    <label for="student">Я студент</label>
+                </div>
+            </div>
+
+            <div class="input-box button">
+                <button type="submit">Увійти</button>
+            </div>
+        </form>
+    </div>
 </template>
 
 <script>
-    export default{
-        name: 'loginComp'
+    export default {
+        name: 'loginComp',
+        data() {
+            return {
+                login: '',
+                password: '',
+                role: ''
+            };
+        }
     }
 </script>
-
-<style>
-.btn{
-    margin: 10px 0;
-}
-</style>
