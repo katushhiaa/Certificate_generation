@@ -31,7 +31,9 @@
     </div>
   </template>
   
-  <script>
+<script>
+import { dbConnect, insertUser } from './script.js';
+
   export default {
     name: 'RegistrationForm',
     data() {
@@ -44,7 +46,7 @@
       };
     },
     methods: {
-      submitForm() {
+      async submitForm() {
 
         if (this.password !== this.confirmPassword) {
           alert('Passwords do not match.');
@@ -63,15 +65,25 @@
           role: this.role
         });
   
+        const db = await dbConnect();
+        await insertUser(db, {
+          name: this.name,
+          email: this.email,
+          password: this.password,
+          role: this.role
+        });
+
         this.name = '';
         this.email = '';
         this.password = '';
         this.confirmPassword = '';
         this.role = '';
+
+        alert('User registered successfully!');
       },
-      redirectToLogin() {
-      this.$router.push('/login');
-    }
+        redirectToLogin() {
+        this.$router.push('/login');
+      }
     }
   };
   </script>
