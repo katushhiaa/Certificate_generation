@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
         <h2>Увійти</h2>
-        <form name="login-form">
+        <form name="login-form" @submit.prevent="submitLogin">
             <div class="auth-inner">
                 <div class="input-box">
                     <input type="text" v-model="name" placeholder="Введіть свій логін" required>
@@ -23,6 +23,9 @@
             <div class="input-box button">
                 <button type="submit">Увійти</button>
             </div>
+            <div class="text">
+                    <h3>Не маєте акаунт?<a href="#" @click="redirectToSignUp">Зареєструватись</a></h3>
+                </div>
         </form>
     </div>
 </template>
@@ -36,6 +39,18 @@
                 password: '',
                 role: ''
             };
+        },
+        methods:{
+            submitLogin(){
+                if(this.role == "teacher"){
+                    this.$router.push('/teacher');
+                } else if (this.role == "student"){
+                    this.$router.push('/student');
+                }
+            },
+            redirectToSignUp(){
+                this.$router.push('/signup');
+            }
         }
     }
 </script>

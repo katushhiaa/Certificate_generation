@@ -47,12 +47,12 @@ body{
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #4070f4;
+  background: #F3836B;
 }
 .wrapper {
   position: relative;
   width: 90%; 
-  margin: 0 auto; 
+  margin: 70px auto 0;
   background: #fff;
   padding: 34px;
   border-radius: 6px;
@@ -78,7 +78,7 @@ body{
   height: 3px;
   width: 28px;
   border-radius: 12px;
-  background: #4070f4;
+  background: #F3836B;
 }
 .wrapper form{
   margin-top: 30px;
@@ -102,7 +102,7 @@ form .input-box input{
 }
 .input-box input:focus,
 .input-box input:valid{
-  border-color: #4070f4;
+  border-color: #F3836B;
 }
 form h3{
   color: #707070;
@@ -114,11 +114,11 @@ form h3{
   color: #fff;
   letter-spacing: 1px;
   border: none;
-  background: #4070f4;
+  background: #AB4C37;
   cursor: pointer;
 }
 .input-box.button input:hover{
-  background: #0e4bf1;
+  background: #AB4C37;
 }
 
 .input-box.button button {
@@ -131,13 +131,13 @@ form h3{
   color: #fff;
   border: none;
   border-radius: 6px;
-  background: #4070f4;
+  background: #AB4C37;
   cursor: pointer;
   transition: background 0.3s ease;
 }
 
 .input-box.button button:hover {
-  background: #0e4bf1;
+  background: #AB4C37;
 }
 
 form .text h3{
@@ -145,6 +145,8 @@ form .text h3{
  width: 100%;
  text-align: center;
 }
+
+
 form .text h3 a{
   color: #4070f4;
   text-decoration: none;
@@ -164,5 +166,10 @@ label {
 
 .role-selection input[type="radio"] {
   margin: 5px;
+}
+
+.text-teacher{
+  color: black;
+  font-family: 'Poppins', sans-serif;
 }
 </style>

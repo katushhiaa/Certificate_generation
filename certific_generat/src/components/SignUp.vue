@@ -32,7 +32,7 @@
   </template>
   
 <script>
-import { dbConnect, insertUser } from './script.js';
+//import { dbConnect, insertUser } from './database.js';
 
   export default {
     name: 'RegistrationForm',
@@ -57,6 +57,12 @@ import { dbConnect, insertUser } from './script.js';
           alert('Please select a role.');
           return;
         }
+
+        if(this.role == "teacher"){
+          this.$router.push('/teacher');
+        } else if (this.role == "student"){
+          this.$router.push('/student');
+        }
   
         console.log('Form submitted with data:', {
           name: this.name,
@@ -65,7 +71,7 @@ import { dbConnect, insertUser } from './script.js';
           role: this.role
         });
   
-        const db = await dbConnect();
+       /* const db = await dbConnect();
         await insertUser(db, {
           name: this.name,
           email: this.email,
@@ -79,7 +85,7 @@ import { dbConnect, insertUser } from './script.js';
         this.confirmPassword = '';
         this.role = '';
 
-        alert('User registered successfully!');
+        alert('User registered successfully!');*/
       },
         redirectToLogin() {
         this.$router.push('/login');
