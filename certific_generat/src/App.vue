@@ -6,32 +6,23 @@
           <router-view></router-view>
         </div>
       </div>
+      <footerComp/>
     </div>
 </template>
 
 <script>
 
 import navComp from './components/NavComp.vue'
+import footerComp from './components/FooterComp.vue'
 
 export default{
   name: 'App',
   components:{
     navComp,
+    footerComp
   }
 }
 
-/*const { MongoClient } = require("mongodb");
-
-const url = "mongodb://localhost:27017";
-const client = new MongoClient(url);
-const dbName = "database";
-
-async function dbConnect() {
-  await client.connect();
-  const db = client.db(dbName);
-  return db;
-}
-module.exports = dbConnect;*/
 </script>
 
 <style>
