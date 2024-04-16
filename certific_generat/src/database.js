@@ -12,6 +12,7 @@ async function dbConnect() {
     return db
   } catch (error) {
     console.error('Error connecting to the database:', error)
+    throw error
   }
 }
 

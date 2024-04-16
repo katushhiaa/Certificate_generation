@@ -1,48 +1,51 @@
 <template>
-    <div id="app">
-     <navComp/>
-      <div class="auth-wrapper">
-        <div class="auth-inner">
-          <router-view></router-view>
-        </div>
+  <div id="app">
+    <navComp />
+    <div class="auth-wrapper">
+      <div class="auth-inner">
+        <router-view></router-view>
       </div>
-      <footerComp/>
     </div>
+    <footerComp />
+  </div>
 </template>
 
 <script>
-
 import navComp from './components/NavComp.vue'
 import footerComp from './components/FooterComp.vue'
 
-export default{
+export default {
   name: 'App',
-  components:{
+  components: {
     navComp,
     footerComp
   }
 }
-
 </script>
 
 <style>
 @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
-*{
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
 }
-body{
+body {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #F3836B;
+  background: #f3836b;
 }
+
 .wrapper {
+  color: #000000;
+}
+
+.form-wrapper {
   position: relative;
-  width: 90%; 
+  width: 90%;
   margin: 70px auto 0;
   background: #fff;
   padding: 34px;
@@ -50,18 +53,18 @@ body{
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
-@media screen and (min-width: 768px) { 
+@media screen and (min-width: 768px) {
   .wrapper {
-    width: 430px; 
+    width: 430px;
   }
 }
-.wrapper h2{
+.wrapper h2 {
   position: relative;
   font-size: 22px;
   font-weight: 600;
   color: #333;
 }
-.wrapper h2::before{
+.wrapper h2::before {
   content: '';
   position: absolute;
   left: 0;
@@ -69,16 +72,16 @@ body{
   height: 3px;
   width: 28px;
   border-radius: 12px;
-  background: #F3836B;
+  background: #f3836b;
 }
-.wrapper form{
+.wrapper form {
   margin-top: 30px;
 }
-.wrapper form .input-box{
+.wrapper form .input-box {
   height: 52px;
   margin: 18px 0;
 }
-form .input-box input{
+form .input-box input {
   height: 100%;
   width: 100%;
   outline: none;
@@ -86,30 +89,30 @@ form .input-box input{
   font-size: 17px;
   font-weight: 400;
   color: #333;
-  border: 1.5px solid #C7BEBE;
+  border: 1.5px solid #c7bebe;
   border-bottom-width: 2.5px;
   border-radius: 6px;
   transition: all 0.3s ease;
 }
 .input-box input:focus,
-.input-box input:valid{
-  border-color: #F3836B;
+.input-box input:valid {
+  border-color: #f3836b;
 }
-form h3{
+form h3 {
   color: #707070;
   font-size: 14px;
   font-weight: 500;
   margin-left: 10px;
 }
-.input-box.button input{
+.input-box.button input {
   color: #fff;
   letter-spacing: 1px;
   border: none;
-  background: #AB4C37;
+  background: #ab4c37;
   cursor: pointer;
 }
-.input-box.button input:hover{
-  background: #AB4C37;
+.input-box.button input:hover {
+  background: #ab4c37;
 }
 
 .input-box.button button {
@@ -122,27 +125,26 @@ form h3{
   color: #fff;
   border: none;
   border-radius: 6px;
-  background: #AB4C37;
+  background: #ab4c37;
   cursor: pointer;
   transition: background 0.3s ease;
 }
 
 .input-box.button button:hover {
-  background: #AB4C37;
+  background: #ab4c37;
 }
 
-form .text h3{
- color: #333;
- width: 100%;
- text-align: center;
+form .text h3 {
+  color: #333;
+  width: 100%;
+  text-align: center;
 }
 
-
-form .text h3 a{
+form .text h3 a {
   color: #4070f4;
   text-decoration: none;
 }
-form .text h3 a:hover{
+form .text h3 a:hover {
   text-decoration: underline;
 }
 
@@ -155,11 +157,11 @@ label {
   color: #000000;
 }
 
-.role-selection input[type="radio"] {
+.role-selection input[type='radio'] {
   margin: 5px;
 }
 
-.text-teacher{
+.text-teacher {
   color: black;
   font-family: 'Poppins', sans-serif;
 }
