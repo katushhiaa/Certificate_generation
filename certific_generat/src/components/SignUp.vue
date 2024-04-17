@@ -44,6 +44,8 @@
 </template>
 
 <script>
+//import { dbConnect } from '@/database'
+
 //import { dbConnect, insertUser } from '../database';
 
 export default {
@@ -82,6 +84,7 @@ export default {
         role: this.role
       })
 
+      //dbConnect()
       /*const db = await dbConnect();
         await insertUser(db, {
           name: this.name,

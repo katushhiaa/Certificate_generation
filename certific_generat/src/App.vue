@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <navComp />
-    <div class="auth-wrapper">
-      <div class="auth-inner">
+    <div>
+      <div>
         <router-view></router-view>
       </div>
     </div>
@@ -51,20 +51,22 @@ body {
   padding: 34px;
   border-radius: 6px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  height: 90%;
+  max-height: 550px;
 }
 
 @media screen and (min-width: 768px) {
-  .wrapper {
+  .form-wrapper {
     width: 430px;
   }
 }
-.wrapper h2 {
+.form-wrapper h2 {
   position: relative;
   font-size: 22px;
   font-weight: 600;
   color: #333;
 }
-.wrapper h2::before {
+.form-wrapper h2::before {
   content: '';
   position: absolute;
   left: 0;
@@ -74,10 +76,10 @@ body {
   border-radius: 12px;
   background: #f3836b;
 }
-.wrapper form {
+.form-wrapper form {
   margin-top: 30px;
 }
-.wrapper form .input-box {
+.form-wrapper form .input-box {
   height: 52px;
   margin: 18px 0;
 }
