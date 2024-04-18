@@ -44,10 +44,6 @@
 </template>
 
 <script>
-//import { dbConnect } from '@/database'
-
-//import { dbConnect, insertUser } from '../database';
-
 export default {
   name: 'RegistrationForm',
   data() {
@@ -83,23 +79,6 @@ export default {
         password: this.password,
         role: this.role
       })
-
-      //dbConnect()
-      /*const db = await dbConnect();
-        await insertUser(db, {
-          name: this.name,
-          email: this.email,
-          password: this.password,
-          role: this.role
-        });
-
-        this.name = '';
-        this.email = '';
-        this.password = '';
-        this.confirmPassword = '';
-        this.role = '';
-
-        alert('User registered successfully!');*/
     },
     redirectToLogin() {
       this.$router.push('/login')
