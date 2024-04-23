@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import Network from '@/Network'
 
 export default {
   name: 'RegistrationForm',
@@ -67,7 +67,7 @@ export default {
       })
 
       try {
-        const response = await axios.post('/signup', {
+        const response = await Network.signUp({
           name: this.name,
           email: this.email,
           password: this.password,
@@ -75,7 +75,7 @@ export default {
         })
         console.log(response.data)
       } catch (error) {
-        console.error(error)
+        console.error(error.response.data)
       }
     }
   }

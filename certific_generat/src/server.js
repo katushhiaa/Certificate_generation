@@ -1,9 +1,11 @@
 import express from 'express'
 import mongoose from 'mongoose'
+import cors from 'cors'
 
 const app = express()
 
 app.use(express.json())
+app.use(cors())
 
 mongoose.connect('mongodb://localhost:27017/database')
 
@@ -23,17 +25,16 @@ const User = mongoose.model('User', userSchema)
 
 app.post('/signup', async (req, res) => {
   const { name, email, password, role } = req.body
-
-  const newUser = new User({ name, email, password, role })
-  console.log(newUser)
-  db.collection('users').insertOne(newUser, (err) => {
-    if (err) {
-      throw err
-    } else {
-      console.log('User registered successfully')
-      res.status(200).json({ message: 'User registered successfully' })
-    }
-  })
+  try {
+    const newUser = new User({ name, email, password, role })
+    console.log(newUser)
+    await newUser.save()
+    console.log('User registered successfully')
+    return res.status(200).json({ message: 'Користувач успішно зареєстрований' })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ message: 'Помилка при реєстрації користувача' })
+  }
 })
 
 app.listen(3001, () => {
