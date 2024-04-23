@@ -23,13 +23,17 @@ const User = mongoose.model('User', userSchema)
 
 app.post('/signup', async (req, res) => {
   const { name, email, password, role } = req.body
-  try {
-    const newUser = new User({ name, email, password, role })
-    await newUser.save()
-    res.status(201).json({ message: 'User registered successfully' })
-  } catch (error) {
-    res.status(500).json({ error: 'Internal server error' })
-  }
+
+  const newUser = new User({ name, email, password, role })
+  console.log(newUser)
+  db.collection('users').insertOne(newUser, (err) => {
+    if (err) {
+      throw err
+    } else {
+      console.log('User registered successfully')
+      res.status(200).json({ message: 'User registered successfully' })
+    }
+  })
 })
 
 app.listen(3001, () => {

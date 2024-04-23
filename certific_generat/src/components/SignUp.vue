@@ -44,6 +44,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'RegistrationForm',
   data() {
@@ -57,31 +59,24 @@ export default {
   },
   methods: {
     async submitForm() {
-      if (this.password !== this.confirmPassword) {
-        alert('Passwords do not match.')
-        return
-      }
-
-      if (!this.role) {
-        alert('Please select a role.')
-        return
-      }
-
-      if (this.role == 'teacher') {
-        this.$router.push('/teacher')
-      } else if (this.role == 'student') {
-        this.$router.push('/student')
-      }
-
       console.log('Form submitted with data:', {
         name: this.name,
         email: this.email,
         password: this.password,
         role: this.role
       })
-    },
-    redirectToLogin() {
-      this.$router.push('/login')
+
+      try {
+        const response = await axios.post('/signup', {
+          name: this.name,
+          email: this.email,
+          password: this.password,
+          role: this.role
+        })
+        console.log(response.data)
+      } catch (error) {
+        console.error(error)
+      }
     }
   }
 }
