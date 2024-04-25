@@ -9,6 +9,10 @@ class Network {
     return axios.post(`${this.baseUrl}/signup`, data)
   }
 
+  login(data) {
+    return axios.post(`${this.baseUrl}/login`, data)
+  }
+
   getAll() {
     return axios.get(`${this.baseUrl}/signup`)
   }

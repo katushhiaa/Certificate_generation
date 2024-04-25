@@ -66,6 +66,27 @@ export default {
         role: this.role
       })
 
+      if (this.password !== this.confirmPassword) {
+        alert('Passwords do not match.')
+        return
+      }
+
+      if (!this.role) {
+        alert('Please select a role.')
+        return
+      }
+
+      if (this.password.length < 6) {
+        alert('Password must be at least 6 characters long.')
+        return
+      }
+
+      if (this.role === 'teacher') {
+        this.$router.push('/teacher')
+      } else if (this.role === 'student') {
+        this.$router.push('/student')
+      }
+
       try {
         const response = await Network.signUp({
           name: this.name,
@@ -77,6 +98,9 @@ export default {
       } catch (error) {
         console.error(error.response.data)
       }
+    },
+    redirectToLogin() {
+      this.$router.push('/login')
     }
   }
 }

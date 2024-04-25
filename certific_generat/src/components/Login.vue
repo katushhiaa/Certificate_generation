@@ -33,21 +33,33 @@
 </template>
 
 <script>
+import Network from '@/Network'
 export default {
   name: 'loginComp',
   data() {
     return {
-      login: '',
+      name: '',
       password: '',
       role: ''
     }
   },
   methods: {
-    submitLogin() {
-      if (this.role == 'teacher') {
+    async submitLogin() {
+      if (this.role === 'teacher') {
         this.$router.push('/teacher')
-      } else if (this.role == 'student') {
+      } else if (this.role === 'student') {
         this.$router.push('/student')
+      }
+
+      try {
+        const response = await Network.login({
+          name: this.name,
+          password: this.password,
+          role: this.role
+        })
+        console.log(response.data)
+      } catch (error) {
+        console.log(error)
       }
     },
     redirectToSignUp() {

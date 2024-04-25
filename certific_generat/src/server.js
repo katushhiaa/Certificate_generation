@@ -23,17 +23,34 @@ const userSchema = new mongoose.Schema({
 })
 const User = mongoose.model('User', userSchema)
 
-app.post('/signup', async (req, res) => {
+app.post('/signup', async (req) => {
   const { name, email, password, role } = req.body
   try {
+    const existingUser = await User.findOne({ email: email })
+    if (existingUser) {
+      return console.log('Користувач з цією електронною адресою вже існує')
+    }
     const newUser = new User({ name, email, password, role })
     console.log(newUser)
     await newUser.save()
     console.log('User registered successfully')
-    return res.status(200).json({ message: 'Користувач успішно зареєстрований' })
   } catch (error) {
     console.error(error)
-    return res.status(500).json({ message: 'Помилка при реєстрації користувача' })
+  }
+})
+
+app.post('/login', async (req) => {
+  const { name, password, role } = req.body
+  try {
+    const user = await User.findOne({ name, password, role })
+    if (user) {
+      console.log('Вхід успішний', user)
+    } else {
+      console.log('Неправильні дані входу')
+    }
+  } catch (error) {
+    console.error(error)
+    return console.log('Помилка сервера')
   }
 })
 
