@@ -13,6 +13,10 @@ class Network {
     return axios.post(`${this.baseUrl}/login`, data)
   }
 
+  getAllStudents() {
+    return axios.get(`${this.baseUrl}/students`)
+  }
+
   getAll() {
     return axios.get(`${this.baseUrl}/signup`)
   }

@@ -54,6 +54,17 @@ app.post('/login', async (req) => {
   }
 })
 
+app.get('/students', async (req, res) => {
+  try {
+    const students = await User.find({ role: 'student' })
+    console.log(students)
+    res.status(200).json(students)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
+})
+
 app.listen(3001, () => {
   console.log('Server is running')
 })

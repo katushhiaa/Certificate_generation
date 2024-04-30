@@ -1,62 +1,69 @@
 <template>
   <div class="teacher">
-    <div class="wrapper">
-      <div class="teacherContainer">
-        <div class="form-wrapper">
-          <h2>Введіть дані сертифікату</h2>
-          <form @submit.prevent="generateCertificate">
-            <div class="input-box">
-              <input
-                v-model="formData.title"
-                type="text"
-                id="title"
-                required
-                placeholder="Назва заходу (участь в)"
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="teacherContainer">
+            <div class="students-container">
+              <h3>Всі студенти:</h3>
+              <VueMultiselect
+                v-model="selectedStudents"
+                :options="data.students"
+                :multiple="true"
+                :close-on-select="true"
+                placeholder="Оберіть студентів"
+                label="name"
+                track-by="name"
+                class="w-100"
               />
             </div>
-            <div class="input-box">
-              <input
-                v-model="formData.duration"
-                type="text"
-                id="duration"
-                required
-                placeholder="Тривалість (Наприклад: 1 година)"
-              />
-            </div>
-            <div class="input-box">
-              <input
-                v-model="formData.teacherSurname"
-                type="text"
-                id="surname-teacher"
-                required
-                placeholder="Прізвище та ініціали викладача, який проводив захід"
-              />
-            </div>
-            <div class="input-box">
-              <input
-                v-model="formData.studentCount"
-                type="number"
-                min="1"
-                id="students-count"
-                required
-                placeholder="Кількість студентів"
-              />
-            </div>
-            <div class="input-box">
-              <input
-                v-model="formData.studentSurname"
-                type="text"
-                id="surname-student"
-                required
-                placeholder="Прізвища та ініціали для кожного студента"
-              />
-            </div>
-            <div class="input-box button">
-              <button type="submit">Додати</button>
-            </div>
-          </form>
+          </div>
         </div>
-        <div class="carousel-wrapper">
+        <div class="col-md-6">
+          <div class="form-wrapper">
+            <h2>Введіть дані сертифікату</h2>
+            <form @submit.prevent="generateCertificate">
+              <div class="mb-3">
+                <input
+                  v-model="data.title"
+                  type="text"
+                  id="title"
+                  required
+                  class="form-control"
+                  placeholder="Назва заходу (участь в)"
+                />
+              </div>
+              <div class="mb-3">
+                <input
+                  v-model="data.duration"
+                  type="text"
+                  id="duration"
+                  required
+                  class="form-control"
+                  placeholder="Тривалість (Наприклад: 1 година)"
+                />
+              </div>
+              <div class="mb-3">
+                <input
+                  v-model="data.teacherSurname"
+                  type="text"
+                  id="surname-teacher"
+                  required
+                  class="form-control"
+                  placeholder="Прізвище та ініціали викладача, який проводив захід"
+                />
+              </div>
+              <div class="input-box button">
+                <button type="submit">Додати</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<!--<div class="carousel-wrapper">
           <Carousel>
             <Slide v-for="template in templates" :key="template.class">
               <div class="carousel__item">
@@ -68,34 +75,36 @@
               <Pagination />
             </template>
           </Carousel>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
+        </div>-->
 
 <script>
 import { defineComponent } from 'vue'
-import { Carousel, Navigation, Pagination, Slide } from 'vue3-carousel'
+import Network from '@/Network'
+import VueMultiselect from 'vue-multiselect'
+
+//import { Carousel, Navigation, Pagination, Slide } from 'vue3-carousel'
 
 import 'vue3-carousel/dist/carousel.css'
 export default defineComponent({
   name: 'TeacherPage',
   components: {
+    VueMultiselect
+  },
+  /*components: {
     Carousel,
     Slide,
     Pagination,
     Navigation
-  },
+  }*/
   data() {
     return {
-      formData: {
+      data: {
         title: '',
         duration: '',
         teacherSurname: '',
-        studentCount: '',
-        studentSurname: ''
+        students: []
       },
+      selectedStudents: [],
       templates: [
         { image: 'src/components/img/template1.png' },
         { image: 'src/components/img/template2.png' },
@@ -109,30 +118,22 @@ export default defineComponent({
       ]
     }
   },
+
+  mounted() {
+    this.fetchStudents()
+  },
   methods: {
-    generateCertificate() {},
-    chooseTemplate() {}
+    async fetchStudents() {
+      try {
+        const response = await Network.getAllStudents()
+        console.log('This is response: ', response)
+        this.data.students = response.data.map((student) => ({ name: student.name }))
+      } catch (error) {
+        console.error(error)
+      }
+    }
   }
 })
 </script>
 
-<style>
-.teacherContainer {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-.carousel-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-  padding: 70px 300px;
-}
-
-.carousel__item img {
-  max-width: 100%;
-  max-height: 600px;
-}
-</style>
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>

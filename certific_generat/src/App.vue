@@ -46,7 +46,6 @@ body {
 .form-wrapper {
   position: relative;
   width: 90%;
-  margin: 70px auto 0;
   background: #fff;
   padding: 34px;
   border-radius: 6px;
@@ -166,5 +165,38 @@ label {
 .text-teacher {
   color: black;
   font-family: 'Poppins', sans-serif;
+}
+
+.teacherContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  max-width: 800px;
+}
+
+.students-container {
+  width: auto;
+  height: auto;
+}
+
+@media screen and (min-width: 768px) {
+  .students-container {
+    width: 430px;
+    padding-right: 50px;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Adjust styles for smaller screens */
+  .form-wrapper {
+    width: 90%;
+  }
+}
+
+@media (min-width: 768px) {
+  /* Adjust styles for medium and larger screens */
+  .form-wrapper {
+    width: 430px;
+  }
 }
 </style>
