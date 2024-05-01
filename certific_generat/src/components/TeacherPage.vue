@@ -4,18 +4,21 @@
       <div class="row">
         <div class="col-md-6">
           <div class="teacherContainer">
-            <div class="students-container">
-              <h3>Всі студенти:</h3>
-              <VueMultiselect
-                v-model="selectedStudents"
-                :options="data.students"
-                :multiple="true"
-                :close-on-select="true"
-                placeholder="Оберіть студентів"
-                label="name"
-                track-by="name"
-                class="w-100"
-              />
+            <div class="card">
+              <div class="card-header">
+                <label class="form-checkbox">
+                  <input type="checkbox" @click="selectAll" /> Вибрати всіх
+                  <input type="checkbox" @click="clearSelection" /> Відмінити обрання всіх
+                </label>
+                <tr v-for="student in data.students" :key="student.id">
+                  <td>
+                    <input type="checkbox" v-model="selectedStudents" :value="student" />
+                  </td>
+                  <td>
+                    {{ student.name }}
+                  </td>
+                </tr>
+              </div>
             </div>
           </div>
         </div>
@@ -80,16 +83,12 @@
 <script>
 import { defineComponent } from 'vue'
 import Network from '@/Network'
-import VueMultiselect from 'vue-multiselect'
 
 //import { Carousel, Navigation, Pagination, Slide } from 'vue3-carousel'
 
 import 'vue3-carousel/dist/carousel.css'
 export default defineComponent({
   name: 'TeacherPage',
-  components: {
-    VueMultiselect
-  },
   /*components: {
     Carousel,
     Slide,
@@ -131,6 +130,25 @@ export default defineComponent({
       } catch (error) {
         console.error(error)
       }
+    },
+    selectAll() {
+      this.selectedStudents = [...this.data.students]
+    },
+    clearSelection() {
+      this.selectedStudents = []
+    },
+    selectStudent(student) {
+      if (!this.isSelected(student)) {
+        this.selectedStudents.push(student)
+      } else {
+        const index = this.selectedStudents.indexOf(student)
+        if (index !== -1) {
+          this.selectedStudents.splice(index, 1)
+        }
+      }
+    },
+    isSelected(student) {
+      return this.selectedStudents.includes(student)
     }
   }
 })
