@@ -4,21 +4,36 @@
       <div class="row">
         <div class="col-md-6">
           <div class="teacherContainer">
-            <div class="card">
-              <div class="card-header">
-                <label class="form-checkbox">
-                  <input type="checkbox" @click="selectAll" /> Вибрати всіх
-                  <input type="checkbox" @click="clearSelection" /> Відмінити обрання всіх
-                </label>
-                <tr v-for="student in data.students" :key="student.id">
-                  <td>
-                    <input type="checkbox" v-model="selectedStudents" :value="student" />
-                  </td>
-                  <td>
-                    {{ student.name }}
-                  </td>
-                </tr>
-              </div>
+            <div class="students-container">
+              <b-table
+                :items="data.students"
+                :fields="fields"
+                :select-mode="selectMode"
+                responsive="sm"
+                ref="selectableTable"
+                selectable
+                @row-selected="onRowSelected"
+              >
+                <!--Example scoped slot for select state illustrative purposes -->
+                <template #cell(selected)="{ rowSelected }">
+                  <template v-if="rowSelected">
+                    <span aria-hidden="true">&check;</span>
+                    <span class="sr-only">Selected</span>
+                  </template>
+                  <template v-else>
+                    <span aria-hidden="true">&nbsp;</span>
+                    <span class="sr-only">Not selected</span>
+                  </template>
+                </template>
+              </b-table>
+              <p>
+                <b-button size="sm" @click="selectAllRows">Select all</b-button>
+                <b-button size="sm" @click="clearSelected">Clear selected</b-button>
+              </p>
+              <p>
+                Selected Rows:<br />
+                {{ selectedStudents }}
+              </p>
             </div>
           </div>
         </div>
@@ -83,12 +98,17 @@
 <script>
 import { defineComponent } from 'vue'
 import Network from '@/Network'
+//import { BTable, BButton } from 'bootstrap-vue/es/components'
 
 //import { Carousel, Navigation, Pagination, Slide } from 'vue3-carousel'
 
 import 'vue3-carousel/dist/carousel.css'
 export default defineComponent({
   name: 'TeacherPage',
+  /*components: {
+    BTable,
+    BButton
+  },*/
   /*components: {
     Carousel,
     Slide,
@@ -100,10 +120,11 @@ export default defineComponent({
       data: {
         title: '',
         duration: '',
-        teacherSurname: '',
-        students: []
+        teacherSurname: ''
       },
+      students: [],
       selectedStudents: [],
+      fields: ['selected', 'student_name'],
       templates: [
         { image: 'src/components/img/template1.png' },
         { image: 'src/components/img/template2.png' },
@@ -126,30 +147,21 @@ export default defineComponent({
       try {
         const response = await Network.getAllStudents()
         console.log('This is response: ', response)
-        this.data.students = response.data.map((student) => ({ name: student.name }))
+        this.students = response.data.map((student) => ({ name: student.name }))
+        console.log(this.students)
       } catch (error) {
         console.error(error)
       }
     },
-    selectAll() {
-      this.selectedStudents = [...this.data.students]
+    onRowSelected(students) {
+      this.selected = students
     },
-    clearSelection() {
-      this.selectedStudents = []
+    selectAllRows() {
+      this.$refs.selectableTable.selectAllRows()
+    },
+    clearSelected() {
+      this.$refs.selectableTable.clearSelected()
     }
-    /*selectStudent(student) {
-      if (!this.isSelected(student)) {
-        this.selectedStudents.push(student)
-      } else {
-        const index = this.selectedStudents.indexOf(student)
-        if (index !== -1) {
-          this.selectedStudents.splice(index, 1)
-        }
-      }
-    },
-    isSelected(student) {
-      return this.selectedStudents.includes(student)
-    }*/
   }
 })
 </script>
