@@ -136,8 +136,8 @@ export default defineComponent({
     },
     clearSelection() {
       this.selectedStudents = []
-    },
-    selectStudent(student) {
+    }
+    /*selectStudent(student) {
       if (!this.isSelected(student)) {
         this.selectedStudents.push(student)
       } else {
@@ -149,7 +149,7 @@ export default defineComponent({
     },
     isSelected(student) {
       return this.selectedStudents.includes(student)
-    }
+    }*/
   }
 })
 </script>
