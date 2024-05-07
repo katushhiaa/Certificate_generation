@@ -1,39 +1,62 @@
 <template>
-  <div v-if="certificates.length > 0">
-    <p v-for="(certificate, index) in certificates" :key="index">
-      {{ certificate }}
-    </p>
-  </div>
-  <div v-else>
-    <p>Loading...</p>
+  <div class="container" :style="{ color: color }">
+    <div class="target" ref="target">Vue Moveable</div>
+    <Moveable
+      className="moveable"
+      v-bind:target="['.target']"
+      v-bind:draggable="true"
+      v-bind:scalable="true"
+      v-bind:rotatable="true"
+      @drag="onDrag"
+      @scale="onScale"
+      @rotate="onRotate"
+    />
+    <ColorPicker
+      theme="light"
+      :color="color"
+      :sucker-hide="false"
+      :sucker-canvas="suckerCanvas"
+      :sucker-area="suckerArea"
+      @changeColor="changeColor"
+      @openSucker="openSucker"
+      @inputFocus="inputFocus"
+      @inputBlur="inputBlur"
+    />
   </div>
 </template>
-
 <script>
-import { defineComponent } from "vue";
-import Network from "@/Network";
-export default defineComponent({
-  name: "CreateCertificate",
+import Moveable from "vue3-moveable";
+import { ColorPicker } from "vue-color-kit";
+import "vue-color-kit/dist/vue-color-kit.css";
+
+export default {
+  name: "app",
+  components: {
+    Moveable,
+    ColorPicker,
+  },
   data() {
     return {
-      certificates: [],
+      color: "#59c7f9",
+      suckerCanvas: null,
+      suckerArea: [],
+      isSucking: false,
     };
   },
-  mounted() {
-    this.fetchCertificates();
-  },
   methods: {
-    async fetchCertificates() {
-      try {
-        const response = await Network.getCertData();
-        console.log("This is response: ", response);
-        this.certificates = response.data.map((certificate) => certificate);
-        console.log("Certificates ", this.certificates.length);
-        console.log("Certificates ", this.certificates);
-      } catch (error) {
-        console.error("Error fetching certificates:", error);
-      }
+    changeColor(color) {
+      const { r, g, b, a } = color.rgba;
+      this.color = `rgba(${r}, ${g}, ${b}, ${a})`;
+    },
+    onDrag({ transform }) {
+      this.$refs.target.style.transform = transform;
+    },
+    onScale({ drag }) {
+      this.$refs.target.style.transform = drag.transform;
+    },
+    onRotate({ drag }) {
+      this.$refs.target.style.transform = drag.transform;
     },
   },
-});
+};
 </script>

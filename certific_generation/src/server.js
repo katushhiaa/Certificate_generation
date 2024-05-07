@@ -30,8 +30,8 @@ const certificateSchema = new mongoose.Schema({
   teacherSurname: String,
 });
 
-const User = mongoose.model("User", userSchema);
-const Certificate = mongoose.model("Certificate", certificateSchema);
+const User = mongoose.model("users", userSchema);
+const Certificate = mongoose.model("certificates", certificateSchema);
 
 app.post("/signup", async (req) => {
   const { name, email, password, role } = req.body;
@@ -67,7 +67,11 @@ app.post("/login", async (req) => {
 app.post("/certificateData", async (req) => {
   const { title, duration, teacherSurname } = req.body;
   try {
-    const newCertificate = new Certificate({ title, duration, teacherSurname });
+    const newCertificate = new Certificate({
+      title,
+      duration,
+      teacherSurname,
+    });
     console.log(newCertificate);
     await newCertificate.save();
     console.log("Дані успішно додано");

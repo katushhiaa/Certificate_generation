@@ -23,7 +23,11 @@
     "vite": "^5.2.11",
     "vite-plugin-nightwatch": "^0.4.6",
     "vue": "^3.4.26",
+    "vue-accessible-color-picker": "^5.0.1",
+    "vue-color-kit": "^1.0.6",
     "vue-router": "^4.3.2",
-    "vue3-carousel": "^0.3.3"
+    "vue3-carousel": "^0.3.3",
+    "vue3-moveable": "^0.28.0",
+    "vuetify": "^3.6.3"
   }
 }
