@@ -8,7 +8,6 @@ import "@mdi/font/css/materialdesignicons.css";
 import "vuetify/styles";
 import { createVuetify } from "vuetify";
 import { VDataTable } from "vuetify/components/VDataTable";
-import { Moveable } from "vue3-moveable";
 
 const app = createApp(App);
 
@@ -21,6 +20,5 @@ const vuetify = createVuetify({
 app.use(vuetify);
 app.use(BootstrapVue3);
 app.use(router);
-app.use(movable);
 app.mount("#app");
 export default vuetify;

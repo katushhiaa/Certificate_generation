@@ -74,16 +74,6 @@ export default defineComponent({
   cursor: pointer;
 }
 
-.custom-button {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #ab4c37;
-  color: #fff;
-  border-radius: 5px;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
-}
-
 .custom-button:hover {
   background-color: #ab4c37;
 }
