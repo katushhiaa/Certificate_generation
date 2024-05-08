@@ -50,8 +50,7 @@ body {
   padding: 34px;
   border-radius: 6px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  height: 90%;
-  max-height: 550px;
+  height: 350;
 }
 
 @media screen and (min-width: 768px) {

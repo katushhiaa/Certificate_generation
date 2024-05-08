@@ -1,24 +1,33 @@
 <template>
-  <div class="container" :style="{ color: color }">
-    <div class="target" ref="target">Vue Moveable</div>
-    <Moveable
-      className="moveable"
-      v-bind:target="['.target']"
-      v-bind:draggable="true"
-      v-bind:scalable="true"
-      v-bind:rotatable="true"
-      @drag="onDrag"
-      @scale="onScale"
-      @rotate="onRotate"
-    />
+  <div class="certificate-container">
+    <div class="words-conainer">
+      <div class="moveable-container" :style="{ color: color }">
+        <div class="word" ref="word1">Перше</div>
+        <div class="word" ref="word2">Слово</div>
+        <div class="word" ref="word3">Третє</div>
+        <Moveable
+          className="moveable"
+          v-bind:target="['.word']"
+          v-bind:draggable="true"
+          v-bind:scalable="true"
+          v-bind:rotatable="true"
+          @drag="onDrag"
+          @scale="onScale"
+          @rotate="onRotate"
+        />
+      </div>
+    </div>
+    <div class="input-box button">
+      <button @click="toggleColorPicker">Виберіть колір</button>
+    </div>
     <ColorPicker
+      v-if="colorPickerVisible"
       theme="light"
       :color="color"
       :sucker-hide="false"
       :sucker-canvas="suckerCanvas"
       :sucker-area="suckerArea"
       @changeColor="changeColor"
-      @openSucker="openSucker"
       @inputFocus="inputFocus"
       @inputBlur="inputBlur"
     />
@@ -41,12 +50,16 @@ export default {
       suckerCanvas: null,
       suckerArea: [],
       isSucking: false,
+      colorPickerVisible: false,
     };
   },
   methods: {
     changeColor(color) {
       const { r, g, b, a } = color.rgba;
       this.color = `rgba(${r}, ${g}, ${b}, ${a})`;
+    },
+    toggleColorPicker() {
+      this.colorPickerVisible = !this.colorPickerVisible;
     },
     onDrag({ transform }) {
       this.$refs.target.style.transform = transform;
@@ -60,3 +73,28 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.certificate-container {
+  width: 100%;
+  height: 100%;
+}
+
+.target {
+  position: absolute;
+  top: 100px;
+  left: 25px;
+  transform-origin: top left;
+  word-break: break-all;
+  width: auto;
+}
+
+.words-conainer {
+  position: absolute;
+  top: 80px;
+  left: 20px;
+  width: 300px; /* Ширина прямокутника */
+  height: 200px; /* Висота прямокутника */
+  border: 2px solid black; /* Рамка прямокутника */
+}
+</style>
