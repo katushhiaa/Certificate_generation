@@ -17,10 +17,22 @@
             {{ word.text }}
           </div>
         </div>
-        <div class="input-box button">
+        <div class="input-box" style="top: 280px">
           <button @click="pickColorForAllWords" class="custom-button">
-            Вибрати колір для всіх
+            Вибрати колір слів
           </button>
+          <div>
+            <label for="file-upload" class="input-box button">
+              <input
+                id="file-upload"
+                type="file"
+                @change="chooseTemplate"
+                style="display: none"
+              />
+              <span class="custom-button">Вибрати свій</span>
+            </label>
+          </div>
+
           <ColorPicker
             v-if="colorPickerVisible"
             theme="light"
@@ -28,19 +40,23 @@
             @changeColor="changeColorForAllWords($event)"
             @inputFocus="inputFocus"
             @inputBlur="inputBlur"
+            style="width: 220px; height: 300px"
           />
         </div>
       </div>
       <div class="template-container">
-        <label for="file-upload" class="input-box button">
-          <input
-            id="file-upload"
-            type="file"
-            @change="chooseTemplate"
-            style="display: none"
-          />
-          <span class="custom-button">Вибрати свій</span>
-        </label>
+        <img v-if="templateImage" :src="templateImage" alt="Template Image" />
+        <div
+          class="save-button"
+          style="
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+          "
+        >
+          <button @click="saveTemplate">Зберегти</button>
+        </div>
       </div>
     </div>
   </div>
@@ -53,13 +69,15 @@ import "vue-color-kit/dist/vue-color-kit.css";
 export default {
   data() {
     return {
+      templateImage: "",
+
       words: [
-        { text: "Word1", top: 100, left: 10, color: "#59c7f9" },
-        { text: "Word2", top: 150, left: 10, color: "#59c7f9" },
-        { text: "Word3", top: 200, left: 10, color: "#59c7f9" },
-        { text: "Word4", top: 250, left: 10, color: "#59c7f9" },
+        { text: "Word1", top: 100, left: 10, color: "#000000" },
+        { text: "Word2", top: 150, left: 10, color: "#000000" },
+        { text: "Word3", top: 200, left: 10, color: "#000000" },
+        { text: "Word4", top: 250, left: 10, color: "#000000" },
       ],
-      color: "#59c7f9",
+      color: "#000000",
       colorPickerVisible: false,
       dragging: false,
       currentWordIndex: -1,
@@ -102,15 +120,25 @@ export default {
     },
     inputFocus() {},
     inputBlur() {},
+    chooseTemplate(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.templateImage = URL.createObjectURL(file);
+      }
+    },
+    saveTemplate() {
+      console.log("Ім'я зображення:", this.templateImage);
+      console.log("Координати з кольорами всіх полів:");
+      this.words.forEach((word) => {
+        console.log(
+          `${word.text} - Координати: (${word.top}, ${word.left}), Колір: ${word.color}`
+        );
+      });
+    },
   },
 };
 </script>
 <style scoped>
-.page-container {
-  width: 100%;
-  height: 100%;
-  margin: auto 0;
-}
 .page-container {
   width: 100%;
   height: 100%;
@@ -131,13 +159,25 @@ export default {
   right: 0;
   width: 75%;
   height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.template-container img {
+  width: 900px;
+  height: 400px;
+  width: 900px;
+  height: 400px;
+  position: relative;
+  z-index: 1;
+  border: 1px solid black;
 }
 
 .words-container {
   position: relative;
   width: 300px;
-  height: 350px;
-  border: 2px solid black;
+  height: 450px;
 }
 
 .movable-words {
@@ -162,6 +202,7 @@ export default {
 }
 
 .custom-button {
+  margin: 10px 0;
   display: inline-block;
   padding: 10px 20px;
   background-color: #ab4c37;
@@ -171,8 +212,21 @@ export default {
   transition: background-color 0.3s ease;
 }
 
-.input-box.button button {
-  height: 50px;
-  width: 250px;
+.draggable {
+  position: absolute;
+  cursor: move;
+  z-index: 2;
+}
+
+.save-button {
+  margin-bottom: 10px;
+  margin: 10px 0;
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #ab4c37;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
 }
 </style>
