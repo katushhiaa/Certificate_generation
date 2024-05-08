@@ -1,111 +1,67 @@
 <template>
-  <v-data-table
-    :headers="headers"
-    :items="desserts"
-    item-value="name"
-    select-strategy="all"
-    show-select
-  ></v-data-table>
+  <div class="movable-words">
+    <div
+      v-for="(word, index) in words"
+      :key="index"
+      class="draggable"
+      :style="{ top: word.top + 'px', left: word.left + 'px' }"
+      @mousedown="startDrag(index, $event)"
+    >
+      {{ word.text }}
+    </div>
+  </div>
 </template>
+
 <script>
 export default {
   data() {
     return {
-      headers: [
-        {
-          title: "Dessert (100g serving)",
-          align: "start",
-          key: "name",
-        },
-        { title: "Calories", align: "end", key: "calories" },
-        { title: "Fat (g)", align: "end", key: "fat" },
-        { title: "Carbs (g)", align: "end", key: "carbs" },
-        { title: "Protein (g)", align: "end", key: "protein" },
-        { title: "Iron (%)", align: "end", key: "iron" },
+      words: [
+        { text: "Word1", top: 100, left: 100 },
+        { text: "Word2", top: 150, left: 200 },
+        { text: "Word3", top: 200, left: 300 },
+        { text: "Word4", top: 250, left: 400 },
       ],
-      desserts: [
-        {
-          name: "Frozen Yogurt",
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-          iron: 1,
-        },
-        {
-          name: "Ice cream sandwich",
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-          iron: 1,
-        },
-        {
-          name: "Eclair",
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-          iron: 7,
-        },
-        {
-          name: "Cupcake",
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-          iron: 8,
-        },
-        {
-          name: "Gingerbread",
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
-          iron: 16,
-        },
-        {
-          name: "Jelly bean",
-          calories: 375,
-          fat: 0.0,
-          carbs: 94,
-          protein: 0.0,
-          iron: 0,
-        },
-        {
-          name: "Lollipop",
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-          protein: 0,
-          iron: 2,
-        },
-        {
-          name: "Honeycomb",
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-          protein: 6.5,
-          iron: 45,
-        },
-        {
-          name: "Donut",
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-          protein: 4.9,
-          iron: 22,
-        },
-        {
-          name: "KitKat",
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-          protein: 7,
-          iron: 6,
-        },
-      ],
+      dragging: false,
+      currentWordIndex: -1,
+      offsetX: 0,
+      offsetY: 0,
     };
+  },
+  methods: {
+    startDrag(index, event) {
+      this.dragging = true;
+      this.currentWordIndex = index;
+      this.offsetX = event.clientX - this.words[index].left;
+      this.offsetY = event.clientY - this.words[index].top;
+      document.addEventListener("mousemove", this.drag);
+      document.addEventListener("mouseup", this.endDrag);
+    },
+    drag(event) {
+      if (this.dragging) {
+        this.words[this.currentWordIndex].top = event.clientY - this.offsetY;
+        this.words[this.currentWordIndex].left = event.clientX - this.offsetX;
+      }
+    },
+    endDrag() {
+      this.dragging = false;
+      document.removeEventListener("mousemove", this.drag);
+      document.removeEventListener("mouseup", this.endDrag);
+    },
   },
 };
 </script>
+
+<style scoped>
+.movable-words {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.draggable {
+  position: absolute;
+  cursor: move;
+  padding: 5px;
+}
+</style>

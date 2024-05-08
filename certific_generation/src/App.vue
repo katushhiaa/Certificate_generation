@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="main-container">
     <navComp />
     <div>
       <div>
@@ -31,6 +31,7 @@ export default {
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
 }
+
 body {
   min-height: 100vh;
   display: flex;
@@ -189,6 +190,7 @@ label {
   /* Adjust styles for smaller screens */
   .form-wrapper {
     width: 90%;
+    margin: 50px 0;
   }
 }
 
@@ -196,6 +198,7 @@ label {
   /* Adjust styles for medium and larger screens */
   .form-wrapper {
     width: 430px;
+    margin: 75px 0;
   }
 }
 </style>

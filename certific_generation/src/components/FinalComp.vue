@@ -13,17 +13,6 @@
         </template>
       </Carousel>
     </div>
-    <div>
-      <label for="file-upload" class="input-box button">
-        <input
-          id="file-upload"
-          type="file"
-          @change="chooseTemplate"
-          style="display: none"
-        />
-        <span class="custom-button">Вибрати свій</span>
-      </label>
-    </div>
   </div>
 </template>
 

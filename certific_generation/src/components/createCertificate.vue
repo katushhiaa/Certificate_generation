@@ -3,7 +3,31 @@
     <div class="words-conainer">
       <div class="moveable-container" :style="{ color: color }">
         <div class="word" ref="word1">Перше</div>
-        <div class="word" ref="word2">Слово</div>
+        <Moveable
+          className="moveable"
+          v-bind:target="['.word']"
+          v-bind:draggable="true"
+          v-bind:scalable="true"
+          v-bind:rotatable="true"
+          @drag="onDrag"
+          @scale="onScale"
+          @rotate="onRotate"
+        />
+      </div>
+      <div class="moveable-container" :style="{ color: color }">
+        <div class="word" ref="word2">Друге</div>
+        <Moveable
+          className="moveable"
+          v-bind:target="['.word']"
+          v-bind:draggable="true"
+          v-bind:scalable="true"
+          v-bind:rotatable="true"
+          @drag="onDrag"
+          @scale="onScale"
+          @rotate="onRotate"
+        />
+      </div>
+      <div class="moveable-container" :style="{ color: color }">
         <div class="word" ref="word3">Третє</div>
         <Moveable
           className="moveable"
@@ -31,6 +55,17 @@
       @inputFocus="inputFocus"
       @inputBlur="inputBlur"
     />
+    <div>
+      <label for="file-upload" class="input-box button">
+        <input
+          id="file-upload"
+          type="file"
+          @change="chooseTemplate"
+          style="display: none"
+        />
+        <span class="custom-button">Вибрати свій</span>
+      </label>
+    </div>
   </div>
 </template>
 <script>
@@ -78,6 +113,7 @@ export default {
 .certificate-container {
   width: 100%;
   height: 100%;
+  margin: auto 0;
 }
 
 .target {
