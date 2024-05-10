@@ -5,6 +5,7 @@ import multer from "multer";
 import path from "path";
 
 const app = express();
+app.use(cors());
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -27,7 +28,6 @@ let students = [];
 let certificates = [];
 
 app.use(express.json());
-app.use(cors());
 
 mongoose.connect("mongodb://localhost:27017/database");
 

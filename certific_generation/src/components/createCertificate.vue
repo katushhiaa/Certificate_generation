@@ -1,72 +1,74 @@
 <template>
   <div class="page-container">
-    <div class="certificate-container">
-      <div class="words-container">
-        <div class="movable-words">
-          <div
-            v-for="(word, index) in words"
-            :key="index"
-            class="draggable"
-            :style="{
-              top: word.top + 'px',
-              left: word.left + 'px',
-              color: word.color,
-            }"
-            @mousedown="startDrag(index, $event)"
-          >
-            {{ word.text }}
+    <form
+      method="POST"
+      action="http://localhost:3001/upload"
+      enctype="multipart/form-data"
+      @submit.prevent="saveTemplate"
+    >
+      <div class="certificate-container">
+        <div class="words-container">
+          <div class="movable-words">
+            <div
+              v-for="(word, index) in words"
+              :key="index"
+              class="draggable"
+              :style="{
+                top: word.top + 'px',
+                left: word.left + 'px',
+                color: word.color,
+              }"
+              @mousedown="startDrag(index, $event)"
+            >
+              {{ word.text }}
+            </div>
           </div>
-        </div>
-        <div class="input-box" style="top: 280px">
-          <button @click="pickColorForAllWords" class="custom-button">
-            Вибрати колір слів
-          </button>
-          <div>
-            <label for="file-upload" class="input-box button">
-              <input
-                id="file-upload"
-                type="file"
-                @change="chooseTemplate"
-                style="display: none"
-                name="image"
-              />
-              <span class="custom-button">Вибрати свій</span>
-            </label>
-          </div>
+          <div class="input-box" style="top: 280px">
+            <button @click="pickColorForAllWords" class="custom-button">
+              Вибрати колір слів
+            </button>
 
-          <ColorPicker
-            v-if="colorPickerVisible"
-            theme="light"
-            :color="color"
-            @changeColor="changeColorForAllWords($event)"
-            @inputFocus="inputFocus"
-            @inputBlur="inputBlur"
-            style="width: 220px; height: 300px"
-          />
+            <div>
+              <label for="file-upload" class="input-box button">
+                <input
+                  id="file-upload"
+                  type="file"
+                  ref="file"
+                  @change="chooseTemplate"
+                  style="display: none"
+                  name="image"
+                />
+                <span class="custom-button">Вибрати свій</span>
+              </label>
+            </div>
+
+            <ColorPicker
+              v-if="colorPickerVisible"
+              theme="light"
+              :color="color"
+              @changeColor="changeColorForAllWords($event)"
+              @inputFocus="inputFocus"
+              @inputBlur="inputBlur"
+              style="width: 220px; height: 300px"
+            />
+          </div>
         </div>
-      </div>
-      <div class="template-container">
-        <img v-if="templateImage" :src="templateImage" alt="Template Image" />
-        <div
-          class="save-button"
-          style="
-            position: absolute;
-            bottom: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-          "
-        >
-          <form
-            @submit.prevent
-            method="POST"
-            action="http://localhost:3001/upload"
-            enctype="multipart/form-data"
+        <div class="template-container">
+          <img v-if="templateImage" :src="templateImage" alt="Template Image" />
+          <div
+            class="save-button"
+            style="
+              position: absolute;
+              bottom: 10%;
+              left: 50%;
+              transform: translateX(-50%);
+            "
           >
-            <button type="submit" @click="saveTemplate">Зберегти</button>
-          </form>
+            <button type="submit">Зберегти</button>
+          </div>
         </div>
       </div>
-    </div>
+    </form>
   </div>
 </template>
 
@@ -74,6 +76,7 @@
 import { ColorPicker } from "vue-color-kit";
 import "vue-color-kit/dist/vue-color-kit.css";
 import Network from "@/Network";
+import axios from "axios";
 
 export default {
   data() {
@@ -130,12 +133,14 @@ export default {
     inputFocus() {},
     inputBlur() {},
     chooseTemplate(event) {
-      const file = event.target.files[0];
-      if (file) {
-        this.templateImage = URL.createObjectURL(file);
-      }
+      const file = this.$refs.file.files[0];
+      console.log("file", file);
+      this.file = file;
+      this.templateImage = URL.createObjectURL(file); // Додано рядок для встановлення посилання на файл
     },
     async saveTemplate() {
+      const formData = new FormData();
+      formData.append("image", this.file);
       console.log("Ім'я зображення:", this.templateImage);
       console.log("Координати з кольорами всіх полів:");
       this.words.forEach((word) => {
@@ -143,6 +148,7 @@ export default {
           `${word.text} - Координати: (${word.top}, ${word.left}), Колір: ${word.color}`
         );
       });
+      console.log("formData", formData);
       const response = await Network.saveTemplateData({
         title_color: this.words[0].color,
         title_top: this.words[0].top,
@@ -159,7 +165,9 @@ export default {
         dateOfGiving_color: this.words[4].color,
         dateOfGiving_top: this.words[4].top,
         dateOfGiving_left: this.words[4].left,
+        formData,
       });
+      await Network.uploadFile(formData);
       console.log(response.data);
     },
   },
