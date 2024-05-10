@@ -25,6 +25,18 @@ class Network {
     return axios.get(`${this.baseUrl}/getCertData`);
   }
 
+  saveTemplateData(data) {
+    return axios.post(`${this.baseUrl}/saveTemplateData`, data);
+  }
+
+  uploadFile(formData) {
+    return axios.post(`${this.baseUrl}/upload`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
+
   getAll() {
     return axios.get(`${this.baseUrl}/signup`);
   }

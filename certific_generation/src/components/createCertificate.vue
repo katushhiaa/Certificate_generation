@@ -28,6 +28,7 @@
                 type="file"
                 @change="chooseTemplate"
                 style="display: none"
+                name="image"
               />
               <span class="custom-button">Вибрати свій</span>
             </label>
@@ -55,7 +56,14 @@
             transform: translateX(-50%);
           "
         >
-          <button @click="saveTemplate">Зберегти</button>
+          <form
+            @submit.prevent
+            method="POST"
+            action="http://localhost:3001/upload"
+            enctype="multipart/form-data"
+          >
+            <button type="submit" @click="saveTemplate">Зберегти</button>
+          </form>
         </div>
       </div>
     </div>
@@ -65,17 +73,18 @@
 <script>
 import { ColorPicker } from "vue-color-kit";
 import "vue-color-kit/dist/vue-color-kit.css";
+import Network from "@/Network";
 
 export default {
   data() {
     return {
       templateImage: "",
-
       words: [
-        { text: "Word1", top: 100, left: 10, color: "#000000" },
-        { text: "Word2", top: 150, left: 10, color: "#000000" },
-        { text: "Word3", top: 200, left: 10, color: "#000000" },
-        { text: "Word4", top: 250, left: 10, color: "#000000" },
+        { text: "Word1", top: 60, left: 10, color: "#000000" },
+        { text: "Word2", top: 110, left: 10, color: "#000000" },
+        { text: "Word3", top: 160, left: 10, color: "#000000" },
+        { text: "Word4", top: 210, left: 10, color: "#000000" },
+        { text: "Date", top: 260, left: 10, color: "#000000" },
       ],
       color: "#000000",
       colorPickerVisible: false,
@@ -126,7 +135,7 @@ export default {
         this.templateImage = URL.createObjectURL(file);
       }
     },
-    saveTemplate() {
+    async saveTemplate() {
       console.log("Ім'я зображення:", this.templateImage);
       console.log("Координати з кольорами всіх полів:");
       this.words.forEach((word) => {
@@ -134,6 +143,24 @@ export default {
           `${word.text} - Координати: (${word.top}, ${word.left}), Колір: ${word.color}`
         );
       });
+      const response = await Network.saveTemplateData({
+        title_color: this.words[0].color,
+        title_top: this.words[0].top,
+        title_left: this.words[0].left,
+        duration_color: this.words[1].color,
+        duration_top: this.words[1].top,
+        duration_left: this.words[1].left,
+        teacherSurname_color: this.words[2].color,
+        teacherSurname_top: this.words[2].top,
+        teacherSurname_left: this.words[2].left,
+        studentName_color: this.words[3].color,
+        studentName_top: this.words[3].top,
+        studentName_left: this.words[3].left,
+        dateOfGiving_color: this.words[4].color,
+        dateOfGiving_top: this.words[4].top,
+        dateOfGiving_left: this.words[4].left,
+      });
+      console.log(response.data);
     },
   },
 };

@@ -1,8 +1,28 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import multer from "multer";
+import path from "path";
 
 const app = express();
+
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./images");
+  },
+  filename: (req, file, cb) => {
+    console.log(file);
+    cb(null, Date.now() + "--" + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: fileStorage });
+
+app.post("/upload", upload.single("image"), (req, res) => {
+  console.log(req.file);
+  res.send("Image Uploaded");
+});
+
 let students = [];
 let certificates = [];
 
@@ -30,8 +50,27 @@ const certificateSchema = new mongoose.Schema({
   teacherSurname: String,
 });
 
+const templateSchema = new mongoose.Schema({
+  title_color: String,
+  title_top: Number,
+  title_left: Number,
+  duration_color: String,
+  duration_top: Number,
+  duration_left: Number,
+  teacherSurname_color: String,
+  teacherSurname_top: Number,
+  teacherSurname_left: Number,
+  studentName_color: String,
+  studentName_top: Number,
+  studentName_left: Number,
+  dateOfGiving_color: String,
+  dateOfGiving_top: Number,
+  dateOfGiving_left: Number,
+});
+
 const User = mongoose.model("users", userSchema);
 const Certificate = mongoose.model("certificates", certificateSchema);
+const Template = mongoose.model("certificate_templates", templateSchema);
 
 app.post("/signup", async (req) => {
   const { name, email, password, role } = req.body;
@@ -98,6 +137,51 @@ app.get("/students", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error" });
+  }
+});
+
+app.post("/saveTemplateData", async (req, res) => {
+  const {
+    title_color,
+    title_top,
+    title_left,
+    duration_color,
+    duration_top,
+    duration_left,
+    teacherSurname_color,
+    teacherSurname_top,
+    teacherSurname_left,
+    studentName_color,
+    studentName_top,
+    studentName_left,
+    dateOfGiving_color,
+    dateOfGiving_top,
+    dateOfGiving_left,
+  } = req.body;
+  try {
+    const newTemplate = new Template({
+      title_color,
+      title_top,
+      title_left,
+      duration_color,
+      duration_top,
+      duration_left,
+      teacherSurname_color,
+      teacherSurname_top,
+      teacherSurname_left,
+      studentName_color,
+      studentName_top,
+      studentName_left,
+      dateOfGiving_color,
+      dateOfGiving_top,
+      dateOfGiving_left,
+    });
+    console.log(newTemplate);
+    await newTemplate.save();
+    res.status(200).json({ message: "Дані успішно збережено" });
+  } catch (error) {
+    console.error("Помилка збереження даних:", error);
+    res.status(500).json({ error: "Помилка сервера" });
   }
 });
 
