@@ -2,9 +2,9 @@
   <div class="final_wrapper">
     <div class="carousel">
       <Carousel>
-        <Slide v-for="template in templates" :key="template.class">
+        <Slide v-for="template in templates" :key="template.image">
           <div class="carousel__item">
-            <img :src="template.image" />
+            <img :src="template.image" alt="Template" />
           </div>
         </Slide>
         <template #addons>
@@ -18,6 +18,7 @@
 
 <script>
 import { defineComponent } from "vue";
+import axios from "axios";
 import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
 import "vue3-carousel/dist/carousel.css";
 
@@ -31,26 +32,21 @@ export default defineComponent({
   },
   data() {
     return {
-      templates: [
-        { image: "src/components/img/template1.png" },
-        { image: "src/components/img/template2.png" },
-        { image: "src/components/img/template3.png" },
-        { image: "src/components/img/template4.png" },
-        { image: "src/components/img/template5.png" },
-        { image: "src/components/img/template6.png" },
-        { image: "src/components/img/template7.png" },
-        { image: "src/components/img/template8.png" },
-        { image: "src/components/img/template9.png" },
-      ],
+      templates: [],
     };
   },
+  created() {
+    this.fetchImages();
+  },
   methods: {
-    chooseTemplate(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const imageUrl = URL.createObjectURL(file);
-        this.templates.push({ image: imageUrl });
-        console.log(this.templates);
+    async fetchImages() {
+      try {
+        const response = await axios.get("http://localhost:3001/images");
+        this.templates = response.data.map((imagePath) => ({
+          image: `http://localhost:3001${imagePath}`,
+        }));
+      } catch (error) {
+        console.error("Error fetching images:", error);
       }
     },
   },
@@ -68,23 +64,5 @@ export default defineComponent({
 .carousel__item img {
   max-width: 100%;
   max-height: 300px;
-}
-
-.input-box.button {
-  cursor: pointer;
-}
-
-.custom-button {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #ab4c37;
-  color: #fff;
-  border-radius: 5px;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
-}
-
-.custom-button:hover {
-  background-color: #ab4c37;
 }
 </style>

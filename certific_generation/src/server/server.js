@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import multer from "multer";
 import path from "path";
+import fs from "fs";
 
 const app = express();
 app.use(cors());
@@ -21,14 +22,23 @@ const upload = multer({ storage: fileStorage });
 
 app.post("/upload", upload.single("image"), (req, res) => {
   console.log(req.file);
-  // const imageResposne = {
-  //   imagePath: req.file.path,
-  // };
   res.json({
     imagePath: req.file.path,
   });
-  // console.log("file", imageResposne);
-  // res.send("Image Uploaded");
+});
+
+const imagesFolderPath = path.resolve("images");
+app.use("/images", express.static(imagesFolderPath));
+
+app.get("/images", (req, res) => {
+  const directoryPath = imagesFolderPath;
+  fs.readdir(directoryPath, (err, files) => {
+    if (err) {
+      return console.log("Unable to scan directory: " + err);
+    }
+    const imagePaths = files.map((file) => `/images/${file}`);
+    res.json(imagePaths);
+  });
 });
 
 let students = [];
