@@ -136,7 +136,7 @@ export default {
       const file = this.$refs.file.files[0];
       console.log("file", file);
       this.file = file;
-      this.templateImage = URL.createObjectURL(file); // Додано рядок для встановлення посилання на файл
+      this.templateImage = URL.createObjectURL(file);
     },
     async saveTemplate() {
       const formData = new FormData();
@@ -148,7 +148,8 @@ export default {
           `${word.text} - Координати: (${word.top}, ${word.left}), Колір: ${word.color}`
         );
       });
-      console.log("formData", formData);
+      const res = await Network.uploadFile(formData);
+      console.log("img res", res);
       const response = await Network.saveTemplateData({
         title_color: this.words[0].color,
         title_top: this.words[0].top,
@@ -165,9 +166,9 @@ export default {
         dateOfGiving_color: this.words[4].color,
         dateOfGiving_top: this.words[4].top,
         dateOfGiving_left: this.words[4].left,
-        formData,
+        imagePath: res.data.imagePath,
       });
-      await Network.uploadFile(formData);
+
       console.log(response.data);
     },
   },

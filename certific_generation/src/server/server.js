@@ -21,7 +21,14 @@ const upload = multer({ storage: fileStorage });
 
 app.post("/upload", upload.single("image"), (req, res) => {
   console.log(req.file);
-  res.send("Image Uploaded");
+  // const imageResposne = {
+  //   imagePath: req.file.path,
+  // };
+  res.json({
+    imagePath: req.file.path,
+  });
+  // console.log("file", imageResposne);
+  // res.send("Image Uploaded");
 });
 
 let students = [];
@@ -66,6 +73,7 @@ const templateSchema = new mongoose.Schema({
   dateOfGiving_color: String,
   dateOfGiving_top: Number,
   dateOfGiving_left: Number,
+  imagePath: String,
 });
 
 const User = mongoose.model("users", userSchema);
@@ -157,6 +165,7 @@ app.post("/saveTemplateData", async (req, res) => {
     dateOfGiving_color,
     dateOfGiving_top,
     dateOfGiving_left,
+    imagePath,
   } = req.body;
   try {
     const newTemplate = new Template({
@@ -175,10 +184,11 @@ app.post("/saveTemplateData", async (req, res) => {
       dateOfGiving_color,
       dateOfGiving_top,
       dateOfGiving_left,
+      imagePath,
     });
     console.log(newTemplate);
     await newTemplate.save();
-    res.status(200).json({ message: "Дані успішно збережено" });
+    res.status(200).json({ message: "Дані успішно збережено", imagePath });
   } catch (error) {
     console.error("Помилка збереження даних:", error);
     res.status(500).json({ error: "Помилка сервера" });
