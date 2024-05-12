@@ -150,6 +150,7 @@ app.get("/getCertData", async (req, res) => {
 app.get("/students", async (req, res) => {
   try {
     students = await User.find({ role: "student" });
+
     console.log(students);
     res.status(200).json(students);
   } catch (error) {

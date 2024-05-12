@@ -10,11 +10,10 @@
                 v-model="selectedStudents"
                 :headers="headers"
                 :items="students"
-                item-value="name"
+                item-key="id"
                 select-all
                 show-select
                 :pagination="true"
-                @click:row="onRowSelected"
               ></v-data-table>
               <pre>{{ selectedStudents }}</pre>
             </div>
@@ -94,7 +93,11 @@ export default {
       try {
         this.isBusy = true;
         let response = await Network.getAllStudents();
-        this.students = response.data;
+        this.students = response.data.map((student) => ({
+          id: student._id,
+          name: student.name,
+        }));
+        console.log(this.students);
       } catch (error) {
         console.error("Error fetching student data:", error);
       } finally {
@@ -103,6 +106,14 @@ export default {
     },
     async submitCertForm() {
       console.log("Form submitted with data:", this.data);
+      console.log(this.selectedStudents);
+      if (localStorage) {
+        localStorage.setItem("CertData", JSON.stringify(this.data));
+        localStorage.setItem(
+          "selectedStudents",
+          JSON.stringify(this.selectedStudents)
+        );
+      }
       try {
         const response = await Network.certificateDate(this.data);
         console.log(response.data);
