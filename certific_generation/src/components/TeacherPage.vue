@@ -54,7 +54,9 @@
                 />
               </div>
               <div class="input-box button">
-                <button type="submit">Додати</button>
+                <button type="submit" @click="redirectToTemplateChoose">
+                  Додати
+                </button>
               </div>
             </form>
           </div>
@@ -114,12 +116,9 @@ export default {
           JSON.stringify(this.selectedStudents)
         );
       }
-      try {
-        const response = await Network.certificateDate(this.data);
-        console.log(response.data);
-      } catch (error) {
-        console.error(error);
-      }
+    },
+    redirectToTemplateChoose() {
+      this.$router.push("/certificate");
     },
   },
 };

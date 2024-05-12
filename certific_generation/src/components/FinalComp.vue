@@ -16,6 +16,11 @@
           <Pagination />
         </template>
       </Carousel>
+      <div class="input-box button">
+        <button type="submit" @click="GenerateCertificate">
+          Згенерувати сертифікат
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -25,6 +30,7 @@ import { defineComponent } from "vue";
 import axios from "axios";
 import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
 import "vue3-carousel/dist/carousel.css";
+import Network from "@/Network";
 
 export default defineComponent({
   name: "FinalComp",
@@ -68,6 +74,24 @@ export default defineComponent({
         console.log("Selected template ID:", templateId);
       } catch (error) {
         console.error("Error selecting template:", error);
+      }
+    },
+    async GenerateCertificate() {
+      const selectedStudents = JSON.parse(
+        localStorage.getItem("selectedStudents")
+      );
+      const selectedTemplateId = localStorage.getItem("selectedTemplateId");
+      const CertData = JSON.parse(localStorage.getItem("CertData"));
+
+      try {
+        const response = await Network.generateCertificate({
+          selectedStudents,
+          selectedTemplateId,
+          CertData,
+        });
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
       }
     },
   },

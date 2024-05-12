@@ -37,6 +37,10 @@ class Network {
     });
   }
 
+  async generateCertificate(data) {
+    return axios.post(`${this.baseUrl}/generateCertificate`, data);
+  }
+
   getAll() {
     return axios.get(`${this.baseUrl}/signup`);
   }

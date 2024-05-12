@@ -65,6 +65,12 @@ const certificateSchema = new mongoose.Schema({
   title: String,
   duration: String,
   teacherSurname: String,
+  selectedStudents: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
+  selectedTemplate: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "certificate_templates",
+  },
+  certData: Object,
 });
 
 const templateSchema = new mongoose.Schema({
@@ -115,23 +121,6 @@ app.post("/login", async (req) => {
     } else {
       console.log("Неправильні дані входу");
     }
-  } catch (error) {
-    console.error(error);
-    return console.log("Помилка сервера");
-  }
-});
-
-app.post("/certificateData", async (req) => {
-  const { title, duration, teacherSurname } = req.body;
-  try {
-    const newCertificate = new Certificate({
-      title,
-      duration,
-      teacherSurname,
-    });
-    console.log(newCertificate);
-    await newCertificate.save();
-    console.log("Дані успішно додано");
   } catch (error) {
     console.error(error);
     return console.log("Помилка сервера");
@@ -207,15 +196,35 @@ app.post("/saveTemplateData", async (req, res) => {
 app.get("/getCertificateImageData", async (req, res) => {
   try {
     const imagePath = req.query.imagePath;
-    console.log("Received image path:", imagePath);
     const template = await Template.findOne({ imagePath: imagePath });
     if (!template) {
       return res.status(404).json({ error: "Template not found" });
     }
-    console.log("Found template:", template);
     res.status(200).json({ templateId: template._id });
   } catch (error) {
     console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/generateCertificate", async (req, res) => {
+  const { selectedStudents, selectedTemplateId, CertData } = req.body;
+
+  try {
+    const newCertificate = new Certificate({
+      selectedStudents: selectedStudents,
+      selectedTemplate: selectedTemplateId,
+      title: CertData.title,
+      duration: CertData.duration,
+      teacherSurname: CertData.teacherSurname,
+    });
+
+    await newCertificate.save();
+    console.log(newCertificate);
+    console.log("Certificate generated successfully");
+    res.status(200).json({ message: "Certificate generated successfully" });
+  } catch (error) {
+    console.error("Error generating certificate:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
