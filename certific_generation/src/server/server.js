@@ -150,8 +150,6 @@ app.get("/getCertData", async (req, res) => {
 app.get("/students", async (req, res) => {
   try {
     students = await User.find({ role: "student" });
-
-    console.log(students);
     res.status(200).json(students);
   } catch (error) {
     console.error(error);
@@ -203,6 +201,22 @@ app.post("/saveTemplateData", async (req, res) => {
   } catch (error) {
     console.error("Помилка збереження даних:", error);
     res.status(500).json({ error: "Помилка сервера" });
+  }
+});
+
+app.get("/getCertificateImageData", async (req, res) => {
+  try {
+    const imagePath = req.query.imagePath;
+    console.log("Received image path:", imagePath);
+    const template = await Template.findOne({ imagePath: imagePath });
+    if (!template) {
+      return res.status(404).json({ error: "Template not found" });
+    }
+    console.log("Found template:", template);
+    res.status(200).json({ templateId: template._id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

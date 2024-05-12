@@ -4,7 +4,11 @@
       <Carousel>
         <Slide v-for="template in templates" :key="template.image">
           <div class="carousel__item">
-            <img :src="template.image" alt="Template" />
+            <img
+              :src="template.image"
+              alt="Template"
+              @click="selectTemplate(template)"
+            />
           </div>
         </Slide>
         <template #addons>
@@ -49,6 +53,9 @@ export default defineComponent({
         console.error("Error fetching images:", error);
       }
     },
+    selectTemplate(template) {
+      localStorage.setItem("selectedTemplateId", JSON.stringify(template));
+    },
   },
 });
 </script>
@@ -64,5 +71,6 @@ export default defineComponent({
 .carousel__item img {
   max-width: 100%;
   max-height: 300px;
+  cursor: pointer;
 }
 </style>
