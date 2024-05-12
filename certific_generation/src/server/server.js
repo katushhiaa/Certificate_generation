@@ -229,6 +229,37 @@ app.post("/generateCertificate", async (req, res) => {
   }
 });
 
+app.get("/getSelectedStudents", async (req, res) => {
+  const selectedStudentIds = req.query.selectedStudentIds;
+  try {
+    const selectedStudents = await User.find({
+      _id: { $in: selectedStudentIds },
+    });
+    const selectedStudentNames = selectedStudents.map(
+      (student) => student.name
+    );
+    res.status(200).json(selectedStudentNames);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get("/certificate_template/:id", async (req, res) => {
+  const templateId = req.params.id;
+
+  try {
+    const template = await Template.findById(templateId);
+    if (!template) {
+      return res.status(404).json({ error: "Шаблон сертифіката не знайдено" });
+    }
+    res.status(200).json(template);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Внутрішня помилка сервера" });
+  }
+});
+
 app.listen(3001, () => {
   console.log("Server is running");
 });
