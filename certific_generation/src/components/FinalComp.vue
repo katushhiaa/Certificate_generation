@@ -53,8 +53,22 @@ export default defineComponent({
         console.error("Error fetching images:", error);
       }
     },
-    selectTemplate(template) {
-      localStorage.setItem("selectedTemplateId", JSON.stringify(template));
+    async selectTemplate(template) {
+      try {
+        const response = await axios.get(
+          "http://localhost:3001/getCertificateImageData",
+          {
+            params: {
+              imagePath: template.image.slice(22).replace(/\//g, "\\"),
+            },
+          }
+        );
+        const templateId = response.data.templateId;
+        localStorage.setItem("selectedTemplateId", templateId);
+        console.log("Selected template ID:", templateId);
+      } catch (error) {
+        console.error("Error selecting template:", error);
+      }
     },
   },
 });
