@@ -4,8 +4,10 @@ import cors from "cors";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import nodeHtmlToImage from "node-html-to-image";
 
 const app = express();
+
 app.use(cors());
 
 const fileStorage = multer.diskStorage({
@@ -208,55 +210,104 @@ app.get("/getCertificateImageData", async (req, res) => {
 });
 
 app.post("/generateCertificate", async (req, res) => {
-  const { selectedStudents, selectedTemplateId, CertData } = req.body;
+  const { CertData } = req.body;
 
   try {
-    const newCertificate = new Certificate({
-      selectedStudents: selectedStudents,
-      selectedTemplate: selectedTemplateId,
-      title: CertData.title,
-      duration: CertData.duration,
-      teacherSurname: CertData.teacherSurname,
-    });
+    const selectedStudentIds = req.body.selectedStudentIds;
 
-    await newCertificate.save();
-    console.log(newCertificate);
-    console.log("Certificate generated successfully");
-    res.status(200).json({ message: "Certificate generated successfully" });
-  } catch (error) {
-    console.error("Error generating certificate:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-app.get("/getSelectedStudents", async (req, res) => {
-  const selectedStudentIds = req.query.selectedStudentIds;
-  try {
     const selectedStudents = await User.find({
       _id: { $in: selectedStudentIds },
     });
     const selectedStudentNames = selectedStudents.map(
       (student) => student.name
     );
-    res.status(200).json(selectedStudentNames);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
 
-app.get("/certificate_template/:id", async (req, res) => {
-  const templateId = req.params.id;
-
-  try {
+    const templateId = req.body.selectedTemplateId;
+    console.log(templateId);
     const template = await Template.findById(templateId);
-    if (!template) {
-      return res.status(404).json({ error: "Шаблон сертифіката не знайдено" });
-    }
-    res.status(200).json(template);
+    console.log(template);
+
+    const newCertificate = {
+      selectedStudents: selectedStudentNames,
+      selectedTemplate: template,
+      title: CertData.title,
+      duration: CertData.duration,
+      teacherSurname: CertData.teacherSurname,
+    };
+
+    const image = fs.readFileSync(template.imagePath);
+    const base64Image = new Buffer.from(image).toString("base64");
+    const dataURI = "data:image/jpeg;base64," + base64Image;
+
+    nodeHtmlToImage({
+      output: "./image.png",
+      html: `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Certificate Template</title>
+            <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  text-align: center;
+                }
+                .certificate {
+                  width: 900px;
+                  height: 400px;
+                  margin-top: 50px;
+                }
+                .certificate .title {
+                    position: absolute;                  
+                    font-size: 24px;
+                    margin-top: 20px;
+                    color: ${template.title_color};
+                    top: ${template.title_top};
+                    left: ${template.title_left};
+                }
+                .certificate .duration {
+                    position: absolute; 
+                    font-size: 18px;
+                    margin-top: 10px;
+                    color: ${template.duration_color}
+                    top: ${template.duration_top};
+                    left: ${template.duration_left};
+                }
+                .certificate .teacher {
+                    position: absolute; 
+                    font-size: 18px;
+                    margin-top: 10px;
+                    color: ${template.teacherSurname_color}
+                    top: ${template.teacherSurname_top};
+                    left: ${template.teacherSurname_left};
+                }
+                .certificate .student {
+                  position: absolute; 
+                  font-size: 18px;
+                  margin-top: 10px;
+                  color: ${template.studentName_color}
+                  top: ${template.studentName_top};
+                  left: ${template.studentName_left};
+              }
+            </style>
+        </head>
+        <body>
+            <div class="certificate">
+              <img src="{{imageSource}}"  alt="Certificate Template">
+              
+            </div>
+        </body>
+        </html>
+    `,
+      content: { imageSource: dataURI },
+    }).then(() => console.log("The image was created successfully!"));
+
+    //await newCertificate.save();
+    console.log(newCertificate);
+    console.log("Certificate generated successfully");
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Внутрішня помилка сервера" });
+    console.error("Error generating certificate:", error);
   }
 });
 

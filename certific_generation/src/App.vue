@@ -201,4 +201,9 @@ label {
     margin: 75px 0;
   }
 }
+
+/*.main-container {
+  width: 650px;
+  margin: 0 auto;
+}*/
 </style>

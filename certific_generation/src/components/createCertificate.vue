@@ -8,21 +8,6 @@
     >
       <div class="certificate-container">
         <div class="words-container">
-          <div class="movable-words">
-            <div
-              v-for="(word, index) in words"
-              :key="index"
-              class="draggable"
-              :style="{
-                top: word.top + 'px',
-                left: word.left + 'px',
-                color: word.color,
-              }"
-              @mousedown="startDrag(index, $event)"
-            >
-              {{ word.text }}
-            </div>
-          </div>
           <div class="input-box" style="top: 280px">
             <button @click="pickColorForAllWords" class="custom-button">
               Вибрати колір слів
@@ -55,17 +40,33 @@
         </div>
         <div class="template-container">
           <img v-if="templateImage" :src="templateImage" alt="Template Image" />
-          <div
-            class="save-button"
-            style="
-              position: absolute;
-              bottom: 10%;
-              left: 50%;
-              transform: translateX(-50%);
-            "
-          >
-            <button type="submit">Зберегти</button>
+          <div class="movable-words">
+            <div
+              v-for="(word, index) in words"
+              :key="index"
+              class="draggable"
+              :style="{
+                position: 'absolute',
+                top: word.top + 'px',
+                left: word.left + 'px',
+                color: word.color,
+              }"
+              @mousedown="startDrag(index, $event)"
+            >
+              {{ word.text }}
+            </div>
           </div>
+        </div>
+        <div
+          class="save-button"
+          style="
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+          "
+        >
+          <button type="submit">Зберегти</button>
         </div>
       </div>
     </form>
@@ -83,11 +84,11 @@ export default {
     return {
       templateImage: "",
       words: [
-        { text: "Word1", top: 60, left: 10, color: "#000000" },
-        { text: "Word2", top: 110, left: 10, color: "#000000" },
-        { text: "Word3", top: 160, left: 10, color: "#000000" },
-        { text: "Word4", top: 210, left: 10, color: "#000000" },
-        { text: "Date", top: 260, left: 10, color: "#000000" },
+        { text: "Word1", top: -8, left: -478, color: "#000000" },
+        { text: "Word2", top: 64, left: -475, color: "#000000" },
+        { text: "Word3", top: 116, left: -558, color: "#000000" },
+        { text: "Word4", top: 121, left: -370, color: "#000000" },
+        { text: "Date", top: 158, left: -99, color: "#000000" },
       ],
       color: "#000000",
       colorPickerVisible: false,
@@ -193,16 +194,15 @@ export default {
   position: absolute;
   top: 0;
   right: 0;
-  width: 75%;
-  height: 100%;
+  width: 900px;
+  height: 400px;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 100px;
 }
 
 .template-container img {
-  width: 900px;
-  height: 400px;
   width: 900px;
   height: 400px;
   position: relative;
@@ -218,8 +218,7 @@ export default {
 
 .movable-words {
   position: relative;
-  width: 100%;
-  height: 100%;
+  text-align: center;
 }
 
 .draggable {
@@ -238,7 +237,7 @@ export default {
 }
 
 .custom-button {
-  margin: 10px 0;
+  margin: -27px 0;
   display: inline-block;
   padding: 10px 20px;
   background-color: #ab4c37;

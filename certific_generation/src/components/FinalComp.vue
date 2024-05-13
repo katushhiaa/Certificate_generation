@@ -1,27 +1,34 @@
 <template>
   <div class="final_wrapper">
-    <div class="carousel">
-      <Carousel>
-        <Slide v-for="template in templates" :key="template.image">
-          <div class="carousel__item">
-            <img
-              :src="template.image"
-              alt="Template"
-              @click="selectTemplate(template)"
-            />
-          </div>
-        </Slide>
-        <template #addons>
-          <Navigation />
-          <Pagination />
-        </template>
-      </Carousel>
+    <div class="carousel-wrapper">
+      <div class="carousel">
+        <Carousel>
+          <Slide v-for="template in templates" :key="template.image">
+            <div class="carousel__item">
+              <img
+                :src="template.image"
+                alt="Template"
+                @click="selectTemplate(template)"
+              />
+            </div>
+          </Slide>
+          <template #addons>
+            <Navigation />
+            <Pagination />
+          </template>
+        </Carousel>
+      </div>
       <div class="input-box button">
-        <button type="submit" @click="GenerateCertificate">
+        <button
+          @click="generateCertificate"
+          type="submit"
+          style="width: 250px; height: 50px; margin: 10px"
+        >
           Згенерувати сертифікат
         </button>
       </div>
     </div>
+    <div id="certificate" v-html="htmlTemplate"></div>
   </div>
 </template>
 
@@ -43,6 +50,7 @@ export default defineComponent({
   data() {
     return {
       templates: [],
+      htmlTemplate: "",
     };
   },
   created() {
@@ -76,7 +84,7 @@ export default defineComponent({
         console.error("Error selecting template:", error);
       }
     },
-    async GenerateCertificate() {
+    async generateCertificate() {
       const selectedStudents = JSON.parse(
         localStorage.getItem("selectedStudents")
       );
@@ -90,6 +98,10 @@ export default defineComponent({
           CertData,
         });
         console.log(response.data);
+
+        const htmlTemplate = "";
+
+        this.htmlTemplate = htmlTemplate;
       } catch (error) {
         console.error(error);
       }
@@ -99,16 +111,30 @@ export default defineComponent({
 </script>
 
 <style>
-.carousel-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-  padding: 70px 300px;
-}
 .carousel__item img {
   max-width: 100%;
   max-height: 300px;
   cursor: pointer;
+}
+
+.final_wrapper {
+  width: 1500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+}
+
+.carousel-wrapper {
+  margin-right: 20px;
+}
+
+.input-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#certificate {
+  margin: -50px 10px 0 0;
 }
 </style>
