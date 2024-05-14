@@ -37,9 +37,7 @@
           />
 
           <div class="save-button">
-            <button type="submit" @click="redirectToCertificate">
-              Зберегти
-            </button>
+            <button type="submit">Зберегти</button>
           </div>
         </div>
         <div class="default-word-position"></div>
@@ -152,6 +150,7 @@ export default {
       });
       const res = await Network.uploadFile(formData);
       console.log("img res", res);
+
       const response = await Network.saveTemplateData({
         studentName_color: this.words[0].color,
         studentName_top: this.words[0].top,
@@ -172,8 +171,7 @@ export default {
       });
 
       console.log(response.data);
-    },
-    redirectToCertificate() {
+      alert("Saved sucssesfully");
       this.$router.push("/certificate");
     },
   },

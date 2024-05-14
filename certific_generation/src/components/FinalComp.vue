@@ -27,6 +27,11 @@
           Згенерувати сертифікат
         </button>
       </div>
+      <ul class="generated-sertificats">
+        <li v-for="(image, idx) in generatedSerts" :key="idx">
+          <img :src="image" alt="Template" />
+        </li>
+      </ul>
     </div>
     <div id="certificate" v-html="htmlTemplate"></div>
   </div>
@@ -51,6 +56,7 @@ export default defineComponent({
     return {
       templates: [],
       htmlTemplate: "",
+      generatedSerts: [],
     };
   },
   created() {
@@ -99,9 +105,13 @@ export default defineComponent({
         });
         console.log(response.data);
 
-        const htmlTemplate = "";
+        this.generatedSerts = response.data.map(
+          (img) => `http://localhost:3001${img.substring(1)}`
+        );
 
-        this.htmlTemplate = htmlTemplate;
+        // const htmlTemplate = "";
+
+        // this.htmlTemplate = htmlTemplate;
       } catch (error) {
         console.error(error);
       }
@@ -136,5 +146,20 @@ export default defineComponent({
 
 #certificate {
   margin: -50px 10px 0 0;
+}
+
+.generated-sertificats {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin: 60px 0;
+  text-align: center;
+  gap: 10px;
+}
+
+.generated-sertificats li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 </style>

@@ -43,6 +43,20 @@ app.get("/images", (req, res) => {
   });
 });
 
+const sertificatesFolderPath = path.resolve("sertificates");
+app.use("/sertificates", express.static(sertificatesFolderPath));
+
+app.get("/sertificates", (req, res) => {
+  const directoryPath = sertificatesFolderPath;
+  fs.readdir(directoryPath, (err, files) => {
+    if (err) {
+      return console.log("Unable to scan directory: " + err);
+    }
+    const imagePaths = files.map((file) => `/sertificates/${file}`);
+    res.json(imagePaths);
+  });
+});
+
 let students = [];
 let certificates = [];
 
@@ -211,47 +225,36 @@ app.get("/getCertificateImageData", async (req, res) => {
 
 app.post("/generateCertificate", async (req, res) => {
   const { CertData } = req.body;
-  const selectedStudentIds = req.body.selectedStudentIds;
+  const selectedStudentIds = req.body.selectedStudents;
 
   try {
     const selectedStudents = await User.find({
       _id: { $in: selectedStudentIds },
     });
-    const selectedStudentNames = selectedStudents.map(
-      (student) => student.name
-    );
 
-    console.log(selectedStudentIds);
-    console.log(selectedStudentNames);
+    // const selectedStudentNames = selectedStudents.map(
+    //   (student) => student.name
+    // );
 
-    /*const selectedStudents = await User.find({
-      _id: { $in: selectedStudentIds },
-    });
-
-
-    const selectedStudentNames = selectedStudents.map(
-      (student) => student.name
-    );*/
+    // console.log(selectedStudentIds);
+    // console.log(selectedStudentNames);
 
     const templateId = req.body.selectedTemplateId;
     const template = await Template.findById(templateId);
-    console.log(template);
+    // console.log(template);
 
-    const newCertificate = {
-      selectedStudents: selectedStudentNames,
-      selectedTemplate: template,
-      title: CertData.title,
-      duration: CertData.duration,
-      teacherSurname: CertData.teacherSurname,
-      dateOfGiving: CertData.dateOfGiving,
-    };
-    console.log(newCertificate);
+    // console.log(newCertificate);
 
     const image = fs.readFileSync(template.imagePath);
     const base64Image = new Buffer.from(image).toString("base64");
     const dataURI = "data:image/jpeg;base64," + base64Image;
 
-    const html = `
+    let studentsCnt = selectedStudents.length;
+    const sertificates = [];
+    selectedStudents.forEach((student) => {
+      console.log(`Creating the sertificate for ${student.name}`);
+
+      const html = `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -321,7 +324,7 @@ app.post("/generateCertificate", async (req, res) => {
           <div class="title">${CertData.title}</div>
           <div class="duration">${CertData.duration}</div>
           <div class="teacher">${CertData.teacherSurname}</div>
-          <div class="student">${selectedStudentNames}</div>
+          <div class="student">${student.name}</div>
           <div class="givingDate">${CertData.dateOfGiving}</div>
           <img class="cert-picture" src="{{imageSource}}"  alt="Certificate Template">
         </div>
@@ -329,18 +332,35 @@ app.post("/generateCertificate", async (req, res) => {
     </html>
 `;
 
-    nodeHtmlToImage({
-      output: "./image.png",
-      html,
-      content: { imageSource: dataURI },
-    }).then(() => {
-      console.log("The image was created successfully!");
-      //console.log(html);
+      const sertPath = `./sertificates/${student.id}.png`;
+      sertificates.push(sertPath);
+      nodeHtmlToImage({
+        output: sertPath,
+        html,
+        content: { imageSource: dataURI },
+      }).then(() => {
+        console.log(`The image for ${student.name} was created successfully!`);
+        const newCertificate = {
+          studentId: student.id,
+          templateId: template.id,
+          image: sertPath,
+          // title: CertData.title,
+          // duration: CertData.duration,
+          // teacherSurname: CertData.teacherSurname,
+          // dateOfGiving: CertData.dateOfGiving,
+        };
+        //await newCertificate.save();
+        //console.log(html);
+        studentsCnt--;
+        if (studentsCnt <= 0) {
+          res.status(200).json(sertificates);
+        }
+      });
     });
 
     //await newCertificate.save();
     // console.log(newCertificate);
-    console.log("Certificate generated successfully");
+    // console.log("Certificate generated successfully");
   } catch (error) {
     console.error("Error generating certificate:", error);
   }
