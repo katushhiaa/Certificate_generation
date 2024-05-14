@@ -37,7 +37,9 @@
           />
 
           <div class="save-button">
-            <button type="submit">Зберегти</button>
+            <button type="submit" @click="redirectToCertificate">
+              Зберегти
+            </button>
           </div>
         </div>
         <div class="default-word-position"></div>
@@ -170,6 +172,9 @@ export default {
       });
 
       console.log(response.data);
+    },
+    redirectToCertificate() {
+      this.$router.push("/certificate");
     },
   },
 };

@@ -53,6 +53,16 @@
                   placeholder="Прізвище та ініціали викладача, який проводив захід"
                 />
               </div>
+              <div class="mb-3">
+                <input
+                  v-model="data.dateOfGiving"
+                  type="date"
+                  id="dateOfGiving"
+                  required
+                  class="form-control"
+                  placeholder="Введіть дату видачі"
+                />
+              </div>
               <div class="input-box button">
                 <button type="submit" @click="redirectToTemplateChoose">
                   Додати
@@ -83,6 +93,7 @@ export default {
         title: "",
         duration: "",
         teacherSurname: "",
+        dateOfGiving: "",
       },
       selectedStudents: [],
     };

@@ -211,16 +211,27 @@ app.get("/getCertificateImageData", async (req, res) => {
 
 app.post("/generateCertificate", async (req, res) => {
   const { CertData } = req.body;
+  const selectedStudentIds = req.body.selectedStudentIds;
 
   try {
-    const selectedStudentIds = req.body.selectedStudentIds;
-
     const selectedStudents = await User.find({
       _id: { $in: selectedStudentIds },
     });
     const selectedStudentNames = selectedStudents.map(
       (student) => student.name
     );
+
+    console.log(selectedStudentIds);
+    console.log(selectedStudentNames);
+
+    /*const selectedStudents = await User.find({
+      _id: { $in: selectedStudentIds },
+    });
+
+
+    const selectedStudentNames = selectedStudents.map(
+      (student) => student.name
+    );*/
 
     const templateId = req.body.selectedTemplateId;
     const template = await Template.findById(templateId);
@@ -232,7 +243,9 @@ app.post("/generateCertificate", async (req, res) => {
       title: CertData.title,
       duration: CertData.duration,
       teacherSurname: CertData.teacherSurname,
+      dateOfGiving: CertData.dateOfGiving,
     };
+    console.log(newCertificate);
 
     const image = fs.readFileSync(template.imagePath);
     const base64Image = new Buffer.from(image).toString("base64");
@@ -288,6 +301,14 @@ app.post("/generateCertificate", async (req, res) => {
               left: ${template.studentName_left}px;
               z-index: 999;
           }
+          .certificate .givingDate {
+            position: absolute; 
+            font-size: 18px;
+            color: ${template.dateOfGiving_color};
+            top: ${template.dateOfGiving_top}px;
+            left: ${template.dateOfGiving_left}px;
+            z-index: 999;
+        }
           .cert-picture{
             position: relative;
             width: 900px;
@@ -301,6 +322,7 @@ app.post("/generateCertificate", async (req, res) => {
           <div class="duration">${CertData.duration}</div>
           <div class="teacher">${CertData.teacherSurname}</div>
           <div class="student">${selectedStudentNames}</div>
+          <div class="givingDate">${CertData.dateOfGiving}</div>
           <img class="cert-picture" src="{{imageSource}}"  alt="Certificate Template">
         </div>
     </body>
@@ -313,7 +335,7 @@ app.post("/generateCertificate", async (req, res) => {
       content: { imageSource: dataURI },
     }).then(() => {
       console.log("The image was created successfully!");
-      console.log(html);
+      //console.log(html);
     });
 
     //await newCertificate.save();
