@@ -223,7 +223,6 @@ app.post("/generateCertificate", async (req, res) => {
     );
 
     const templateId = req.body.selectedTemplateId;
-    console.log(templateId);
     const template = await Template.findById(templateId);
     console.log(template);
 
@@ -239,72 +238,86 @@ app.post("/generateCertificate", async (req, res) => {
     const base64Image = new Buffer.from(image).toString("base64");
     const dataURI = "data:image/jpeg;base64," + base64Image;
 
+    const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Certificate Template</title>
+        <style>
+            body {
+              font-family: Arial, sans-serif;
+              text-align: center;
+              width: 900px;
+              height: 400px;
+            }
+            .certificate {
+              width: 900px;
+              height: 400px;
+            }
+            .certificate .title {
+                position: absolute;                  
+                font-size: 24px;
+                color: ${template.title_color};
+                top: ${template.title_top}px;
+                left: ${template.title_left}px;
+                z-index: 999;
+            }
+            .certificate .duration {
+                position: absolute; 
+                font-size: 18px;
+                color: ${template.duration_color};
+                top: ${template.duration_top}px;
+                left: ${template.duration_left}px;
+                z-index:999
+            }
+            .certificate .teacher {
+                position: absolute; 
+                font-size: 18px;
+                color: ${template.teacherSurname_color};
+                top: ${template.teacherSurname_top}px;
+                left: ${template.teacherSurname_left}px;
+                z-index:999
+            }
+            .certificate .student {
+              position: absolute; 
+              font-size: 18px;
+              color: ${template.studentName_color};
+              top: ${template.studentName_top}px;
+              left: ${template.studentName_left}px;
+              z-index: 999;
+          }
+          .cert-picture{
+            position: relative;
+            width: 900px;
+            height: 400px;
+          }
+        </style>
+    </head>
+    <body>
+        <div class="certificate">
+          <div class="title">${CertData.title}</div>
+          <div class="duration">${CertData.duration}</div>
+          <div class="teacher">${CertData.teacherSurname}</div>
+          <div class="student">${selectedStudentNames}</div>
+          <img class="cert-picture" src="{{imageSource}}"  alt="Certificate Template">
+        </div>
+    </body>
+    </html>
+`;
+
     nodeHtmlToImage({
       output: "./image.png",
-      html: `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Certificate Template</title>
-            <style>
-                body {
-                  font-family: Arial, sans-serif;
-                  text-align: center;
-                }
-                .certificate {
-                  width: 900px;
-                  height: 400px;
-                  margin-top: 50px;
-                }
-                .certificate .title {
-                    position: absolute;                  
-                    font-size: 24px;
-                    margin-top: 20px;
-                    color: ${template.title_color};
-                    top: ${template.title_top};
-                    left: ${template.title_left};
-                }
-                .certificate .duration {
-                    position: absolute; 
-                    font-size: 18px;
-                    margin-top: 10px;
-                    color: ${template.duration_color}
-                    top: ${template.duration_top};
-                    left: ${template.duration_left};
-                }
-                .certificate .teacher {
-                    position: absolute; 
-                    font-size: 18px;
-                    margin-top: 10px;
-                    color: ${template.teacherSurname_color}
-                    top: ${template.teacherSurname_top};
-                    left: ${template.teacherSurname_left};
-                }
-                .certificate .student {
-                  position: absolute; 
-                  font-size: 18px;
-                  margin-top: 10px;
-                  color: ${template.studentName_color}
-                  top: ${template.studentName_top};
-                  left: ${template.studentName_left};
-              }
-            </style>
-        </head>
-        <body>
-            <div class="certificate">
-              <img src="{{imageSource}}"  alt="Certificate Template">
-              
-            </div>
-        </body>
-        </html>
-    `,
+      html,
       content: { imageSource: dataURI },
-    }).then(() => console.log("The image was created successfully!"));
+    }).then(() => {
+      console.log("The image was created successfully!");
+      console.log(html);
+    });
 
     //await newCertificate.save();
-    console.log(newCertificate);
+    // console.log(newCertificate);
     console.log("Certificate generated successfully");
   } catch (error) {
     console.error("Error generating certificate:", error);

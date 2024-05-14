@@ -7,37 +7,40 @@
       @submit.prevent="saveTemplate"
     >
       <div class="certificate-container">
-        <div class="words-container">
-          <div class="input-box" style="top: 280px">
-            <button @click="pickColorForAllWords" class="custom-button">
-              Вибрати колір слів
-            </button>
+        <div class="input-box" style="top: 280px">
+          <div>
+            <label for="file-upload" class="input-box button">
+              <input
+                id="file-upload"
+                type="file"
+                ref="file"
+                @change="chooseTemplate"
+                style="display: none"
+                name="image"
+              />
+              <span class="custom-button">Вибрати свій</span>
+            </label>
+          </div>
 
-            <div>
-              <label for="file-upload" class="input-box button">
-                <input
-                  id="file-upload"
-                  type="file"
-                  ref="file"
-                  @change="chooseTemplate"
-                  style="display: none"
-                  name="image"
-                />
-                <span class="custom-button">Вибрати свій</span>
-              </label>
-            </div>
+          <button @click="pickColorForAllWords" class="custom-button">
+            Вибрати колір слів
+          </button>
 
-            <ColorPicker
-              v-if="colorPickerVisible"
-              theme="light"
-              :color="color"
-              @changeColor="changeColorForAllWords($event)"
-              @inputFocus="inputFocus"
-              @inputBlur="inputBlur"
-              style="width: 220px; height: 300px"
-            />
+          <ColorPicker
+            v-if="colorPickerVisible"
+            theme="light"
+            :color="color"
+            @changeColor="changeColorForAllWords($event)"
+            @inputFocus="inputFocus"
+            @inputBlur="inputBlur"
+            style="width: 220px; height: 300px"
+          />
+
+          <div class="save-button">
+            <button type="submit">Зберегти</button>
           </div>
         </div>
+        <div class="default-word-position"></div>
         <div class="template-container">
           <img v-if="templateImage" :src="templateImage" alt="Template Image" />
           <div class="movable-words">
@@ -50,23 +53,13 @@
                 top: word.top + 'px',
                 left: word.left + 'px',
                 color: word.color,
+                'font-size': word.font + 'px',
               }"
               @mousedown="startDrag(index, $event)"
             >
               {{ word.text }}
             </div>
           </div>
-        </div>
-        <div
-          class="save-button"
-          style="
-            position: absolute;
-            bottom: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-          "
-        >
-          <button type="submit">Зберегти</button>
         </div>
       </div>
     </form>
@@ -84,11 +77,17 @@ export default {
     return {
       templateImage: "",
       words: [
-        { text: "Word1", top: -8, left: -478, color: "#000000" },
-        { text: "Word2", top: 64, left: -475, color: "#000000" },
-        { text: "Word3", top: 116, left: -558, color: "#000000" },
-        { text: "Word4", top: 121, left: -370, color: "#000000" },
-        { text: "Date", top: 158, left: -99, color: "#000000" },
+        { text: "Student", top: 0, left: -230, color: "#000000", font: 18 },
+        {
+          text: "Event",
+          top: 24,
+          left: -230,
+          color: "#000000",
+          font: 24,
+        },
+        { text: "Teacher", top: 60, left: -230, color: "#000000", font: 18 },
+        { text: "Duration", top: 90, left: -230, color: "#000000", font: 18 },
+        { text: "Date", top: 120, left: -230, color: "#000000", font: 18 },
       ],
       color: "#000000",
       colorPickerVisible: false,
@@ -152,18 +151,18 @@ export default {
       const res = await Network.uploadFile(formData);
       console.log("img res", res);
       const response = await Network.saveTemplateData({
-        title_color: this.words[0].color,
-        title_top: this.words[0].top,
-        title_left: this.words[0].left,
-        duration_color: this.words[1].color,
-        duration_top: this.words[1].top,
-        duration_left: this.words[1].left,
+        studentName_color: this.words[0].color,
+        studentName_top: this.words[0].top,
+        studentName_left: this.words[0].left,
+        title_color: this.words[1].color,
+        title_top: this.words[1].top,
+        title_left: this.words[1].left,
         teacherSurname_color: this.words[2].color,
         teacherSurname_top: this.words[2].top,
         teacherSurname_left: this.words[2].left,
-        studentName_color: this.words[3].color,
-        studentName_top: this.words[3].top,
-        studentName_left: this.words[3].left,
+        duration_color: this.words[3].color,
+        duration_top: this.words[3].top,
+        duration_left: this.words[3].left,
         dateOfGiving_color: this.words[4].color,
         dateOfGiving_top: this.words[4].top,
         dateOfGiving_left: this.words[4].left,
@@ -177,29 +176,21 @@ export default {
 </script>
 <style scoped>
 .page-container {
-  width: 100%;
-  height: 100%;
-  margin: auto 0;
+  margin: 60px auto;
+  width: 90vw;
 }
 
 .certificate-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
 }
 
 .template-container {
-  position: absolute;
-  top: 0;
-  right: 0;
+  position: relative;
+
   width: 900px;
   height: 400px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 100px;
 }
 
 .template-container img {
@@ -210,15 +201,13 @@ export default {
   border: 1px solid black;
 }
 
-.words-container {
-  position: relative;
-  width: 300px;
-  height: 450px;
-}
-
 .movable-words {
-  position: relative;
+  position: absolute;
   text-align: center;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
 }
 
 .draggable {
@@ -226,10 +215,16 @@ export default {
   cursor: move;
 }
 
+.default-word-position {
+  width: 200px;
+  background: #cccccc54;
+}
+
 .input-box {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
 }
 
 .button {
@@ -237,7 +232,6 @@ export default {
 }
 
 .custom-button {
-  margin: -27px 0;
   display: inline-block;
   padding: 10px 20px;
   background-color: #ab4c37;
@@ -254,8 +248,7 @@ export default {
 }
 
 .save-button {
-  margin-bottom: 10px;
-  margin: 10px 0;
+  margin: 100px 0 0;
   display: inline-block;
   padding: 10px 20px;
   background-color: #ab4c37;

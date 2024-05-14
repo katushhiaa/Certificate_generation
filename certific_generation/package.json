@@ -24,6 +24,7 @@
     "mongoose": "^8.3.3",
     "multer": "^1.4.5-lts.1",
     "node-html-to-image": "^4.0.0",
+    "sharp": "^0.33.3",
     "vite": "^5.2.11",
     "vite-plugin-nightwatch": "^0.4.6",
     "vite-plugin-vuetify": "^2.0.3",
