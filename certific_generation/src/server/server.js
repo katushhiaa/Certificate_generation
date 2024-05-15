@@ -373,7 +373,9 @@ app.post("/generatePDF", async (req, res) => {
     const doc = new PDFDocument({
       layout: "landscape",
     });
-    doc.pipe(fs.createWriteStream("studentCertificates.pdf"));
+
+    const writeStream = fs.createWriteStream("studentCertificates.pdf");
+    doc.pipe(writeStream);
 
     studentCertificates.forEach((certificatePath, index) => {
       doc.image(certificatePath, {
@@ -389,8 +391,9 @@ app.post("/generatePDF", async (req, res) => {
     });
 
     doc.end();
-
-    res.download("studentCertificates.pdf");
+    writeStream.on("finish", function () {
+      res.download("studentCertificates.pdf");
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Помилка сервера" });

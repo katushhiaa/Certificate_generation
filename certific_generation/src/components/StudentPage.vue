@@ -40,9 +40,24 @@ export default {
       }
     },
     async downloadPdf(file) {
-      const response = await axios.post(`http://localhost:3001/generatePDF`, {
-        studentCertificates: [file],
-      });
+      const response = await axios.post(
+        `http://localhost:3001/generatePDF`,
+        {
+          studentCertificates: [file],
+        },
+        {
+          responseType: "blob",
+        }
+      );
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "studentCertificates.pdf");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     },
   },
 };
