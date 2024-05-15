@@ -1,5 +1,5 @@
 <template>
-  <ul class="sertificates">
+  <ul class="certificates">
     <li
       v-for="({ image, file }, idx) in sertificates"
       :key="idx"
@@ -64,7 +64,7 @@ export default {
 </script>
 
 <style>
-.sertificates {
+.certificates {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -73,7 +73,7 @@ export default {
   gap: 10px;
 }
 
-.sertificates li {
+.certificates li {
   margin: 0;
   padding: 0;
   list-style: none;

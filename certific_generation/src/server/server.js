@@ -343,10 +343,6 @@ app.post("/generateCertificate", async (req, res) => {
         }
       });
     });
-
-    //await newCertificate.save();
-    // console.log(newCertificate);
-    // console.log("Certificate generated successfully");
   } catch (error) {
     console.error("Error generating certificate:", error);
   }
