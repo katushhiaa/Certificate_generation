@@ -5,6 +5,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import nodeHtmlToImage from "node-html-to-image";
+import PDFDocument from "pdfkit";
 
 const app = express();
 
@@ -81,12 +82,13 @@ const certificateSchema = new mongoose.Schema({
   title: String,
   duration: String,
   teacherSurname: String,
-  selectedStudents: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
-  selectedTemplate: {
+  certData: Object,
+  image: String,
+  studentId: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+  templateId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "certificate_templates",
   },
-  certData: Object,
 });
 
 const templateSchema = new mongoose.Schema({
@@ -128,7 +130,7 @@ app.post("/signup", async (req) => {
   }
 });
 
-app.post("/login", async (req) => {
+app.post("/login", async (req, res) => {
   const { name, password, role } = req.body;
   try {
     const user = await User.findOne({ name, password, role });
@@ -137,18 +139,12 @@ app.post("/login", async (req) => {
     } else {
       console.log("Неправильні дані входу");
     }
+    if (user.role === "student") {
+      res.status(200).json({ userId: user._id });
+    }
   } catch (error) {
     console.error(error);
     return console.log("Помилка сервера");
-  }
-});
-
-app.get("/getCertData", async (req, res) => {
-  try {
-    certificates = await Certificate.find();
-    res.status(200).json(certificates);
-  } catch (error) {
-    console.log(error);
   }
 });
 
@@ -232,18 +228,8 @@ app.post("/generateCertificate", async (req, res) => {
       _id: { $in: selectedStudentIds },
     });
 
-    // const selectedStudentNames = selectedStudents.map(
-    //   (student) => student.name
-    // );
-
-    // console.log(selectedStudentIds);
-    // console.log(selectedStudentNames);
-
     const templateId = req.body.selectedTemplateId;
     const template = await Template.findById(templateId);
-    // console.log(template);
-
-    // console.log(newCertificate);
 
     const image = fs.readFileSync(template.imagePath);
     const base64Image = new Buffer.from(image).toString("base64");
@@ -338,9 +324,9 @@ app.post("/generateCertificate", async (req, res) => {
         output: sertPath,
         html,
         content: { imageSource: dataURI },
-      }).then(() => {
+      }).then(async () => {
         console.log(`The image for ${student.name} was created successfully!`);
-        const newCertificate = {
+        const newCertificate = new Certificate({
           studentId: student.id,
           templateId: template.id,
           image: sertPath,
@@ -348,8 +334,8 @@ app.post("/generateCertificate", async (req, res) => {
           // duration: CertData.duration,
           // teacherSurname: CertData.teacherSurname,
           // dateOfGiving: CertData.dateOfGiving,
-        };
-        //await newCertificate.save();
+        });
+        await newCertificate.save();
         //console.log(html);
         studentsCnt--;
         if (studentsCnt <= 0) {
@@ -363,6 +349,51 @@ app.post("/generateCertificate", async (req, res) => {
     // console.log("Certificate generated successfully");
   } catch (error) {
     console.error("Error generating certificate:", error);
+  }
+});
+
+app.get("/getStudentCertificates", async (req, res) => {
+  try {
+    const student = req.query.userId;
+    console.log(student);
+    const studentCertificates = await Certificate.find({
+      studentId: student,
+    });
+    res.status(200).json(studentCertificates);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Помилка сервера" });
+  }
+});
+
+app.post("/generatePDF", async (req, res) => {
+  try {
+    const studentCertificates = req.body.studentCertificates;
+
+    const doc = new PDFDocument({
+      layout: "landscape",
+    });
+    doc.pipe(fs.createWriteStream("studentCertificates.pdf"));
+
+    studentCertificates.forEach((certificatePath, index) => {
+      doc.image(certificatePath, {
+        width: 900,
+        height: 400,
+        cover: [doc.page.width - 100, doc.page.height - 300],
+      });
+      if (index !== studentCertificates.length - 1) {
+        doc.addPage({
+          layout: "landscape",
+        });
+      }
+    });
+
+    doc.end();
+
+    res.download("studentCertificates.pdf");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Помилка сервера" });
   }
 });
 

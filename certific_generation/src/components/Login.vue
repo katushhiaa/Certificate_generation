@@ -83,6 +83,8 @@ export default {
           password: this.password,
           role: this.role,
         });
+        const userId = response.data.userId;
+        localStorage.setItem("userId", userId);
         console.log(response.data);
       } catch (error) {
         console.log(error);
