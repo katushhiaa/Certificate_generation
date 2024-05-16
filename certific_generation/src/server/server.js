@@ -6,10 +6,88 @@ import path from "path";
 import fs from "fs";
 import nodeHtmlToImage from "node-html-to-image";
 import PDFDocument from "pdfkit";
+import { MongoClient, ServerApiVersion } from "mongodb";
 
 const app = express();
 
 app.use(cors());
+
+// Replace the following with your Atlas connection string
+/*const url =
+  "mongodb+srv://kanurevamail:<0x02G24YUd6AFGbe>@dimplom-cluster.yc8oa4y.mongodb.net/?retryWrites=true&w=majority&appName=Dimplom-cluster";
+
+const client = new MongoClient(url, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+});
+
+async function run() {
+  try {
+    await client.connect();
+    await client.db("admin").command({ ping: 1 });
+    console.log("Successfully connected to Atlas");
+  } catch (err) {
+    console.log(err.stack);
+  } finally {
+    await client.close();
+  }
+}
+
+run().catch(console.dir);*/
+
+mongoose.connect("mongodb://localhost:27017/database");
+
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", () => {
+  console.log("Connected to MongoDB");
+});
+
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  password: String,
+  role: String,
+});
+
+const certificateSchema = new mongoose.Schema({
+  title: String,
+  duration: String,
+  teacherSurname: String,
+  certData: Object,
+  image: String,
+  studentId: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+  templateId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "certificate_templates",
+  },
+});
+
+const templateSchema = new mongoose.Schema({
+  title_color: String,
+  title_top: Number,
+  title_left: Number,
+  duration_color: String,
+  duration_top: Number,
+  duration_left: Number,
+  teacherSurname_color: String,
+  teacherSurname_top: Number,
+  teacherSurname_left: Number,
+  studentName_color: String,
+  studentName_top: Number,
+  studentName_left: Number,
+  dateOfGiving_color: String,
+  dateOfGiving_top: Number,
+  dateOfGiving_left: Number,
+  imagePath: String,
+});
+
+const User = mongoose.model("users", userSchema);
+const Certificate = mongoose.model("certificates", certificateSchema);
+const Template = mongoose.model("certificate_templates", templateSchema);
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -62,57 +140,6 @@ let students = [];
 let certificates = [];
 
 app.use(express.json());
-
-mongoose.connect("mongodb://localhost:27017/database");
-
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "connection error:"));
-db.once("open", () => {
-  console.log("Connected to MongoDB");
-});
-
-const userSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-  password: String,
-  role: String,
-});
-
-const certificateSchema = new mongoose.Schema({
-  title: String,
-  duration: String,
-  teacherSurname: String,
-  certData: Object,
-  image: String,
-  studentId: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
-  templateId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "certificate_templates",
-  },
-});
-
-const templateSchema = new mongoose.Schema({
-  title_color: String,
-  title_top: Number,
-  title_left: Number,
-  duration_color: String,
-  duration_top: Number,
-  duration_left: Number,
-  teacherSurname_color: String,
-  teacherSurname_top: Number,
-  teacherSurname_left: Number,
-  studentName_color: String,
-  studentName_top: Number,
-  studentName_left: Number,
-  dateOfGiving_color: String,
-  dateOfGiving_top: Number,
-  dateOfGiving_left: Number,
-  imagePath: String,
-});
-
-const User = mongoose.model("users", userSchema);
-const Certificate = mongoose.model("certificates", certificateSchema);
-const Template = mongoose.model("certificate_templates", templateSchema);
 
 app.post("/signup", async (req) => {
   const { name, email, password, role } = req.body;
