@@ -29,10 +29,10 @@ export default {
         const userId = localStorage.getItem("userId");
 
         const response = await axios.get(
-          `http://localhost:3001/getStudentCertificates?userId=${userId}`
+          `http://10.223.178.212:5173/getStudentCertificates?userId=${userId}`
         );
         this.sertificates = response.data.map(({ image }) => ({
-          image: `http://localhost:3001${image.substring(1)}`,
+          image: `http://10.223.178.212:5173${image.substring(1)}`,
           file: image,
         }));
       } catch (error) {
@@ -41,7 +41,7 @@ export default {
     },
     async downloadPdf(file) {
       const response = await axios.post(
-        `http://localhost:3001/generatePDF`,
+        `http://10.223.178.212:5173/generatePDF`,
         {
           studentCertificates: [file],
         },

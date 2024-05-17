@@ -65,9 +65,9 @@ export default defineComponent({
   methods: {
     async fetchImages() {
       try {
-        const response = await axios.get("http://localhost:3001/images");
+        const response = await axios.get("http://10.223.178.212:5173/images");
         this.templates = response.data.map((imagePath) => ({
-          image: `http://localhost:3001${imagePath}`,
+          image: `http://10.223.178.212:5173${imagePath}`,
         }));
       } catch (error) {
         console.error("Error fetching images:", error);
@@ -76,7 +76,7 @@ export default defineComponent({
     async selectTemplate(template) {
       try {
         const response = await axios.get(
-          "http://localhost:3001/getCertificateImageData",
+          "http://10.223.178.212:5173/getCertificateImageData",
           {
             params: {
               imagePath: template.image.slice(22).replace(/\//g, "\\"),
@@ -106,7 +106,7 @@ export default defineComponent({
         console.log(response.data);
 
         this.generatedSerts = response.data.map(
-          (img) => `http://localhost:3001${img.substring(1)}`
+          (img) => `http://10.223.178.212:5173${img.substring(1)}`
         );
 
         // const htmlTemplate = "";

@@ -2,7 +2,7 @@
   <div class="page-container">
     <form
       method="POST"
-      action="http://localhost:3001/upload"
+      action="http://10.223.178.212:5173/upload"
       enctype="multipart/form-data"
       @submit.prevent="saveTemplate"
     >
