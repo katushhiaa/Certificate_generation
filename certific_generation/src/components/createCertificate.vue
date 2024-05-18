@@ -2,7 +2,7 @@
   <div class="page-container">
     <form
       method="POST"
-      action="http://10.223.178.212:5173/upload"
+      action="https://certificate-generation-server.onrender.com/upload"
       enctype="multipart/form-data"
       @submit.prevent="saveTemplate"
     >

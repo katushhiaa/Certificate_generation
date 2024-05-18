@@ -2,7 +2,7 @@ import axios from "axios";
 
 class Network {
   constructor() {
-    this.baseUrl = "http://10.223.178.212:5173";
+    this.baseUrl = "https://certificate-generation-server.onrender.com";
   }
 
   signUp(data) {

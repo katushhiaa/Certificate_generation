@@ -65,9 +65,11 @@ export default defineComponent({
   methods: {
     async fetchImages() {
       try {
-        const response = await axios.get("http://10.223.178.212:5173/images");
+        const response = await axios.get(
+          "https://certificate-generation-server.onrender.com/images"
+        );
         this.templates = response.data.map((imagePath) => ({
-          image: `http://10.223.178.212:5173${imagePath}`,
+          image: `https://certificate-generation-server.onrender.com${imagePath}`,
         }));
       } catch (error) {
         console.error("Error fetching images:", error);
@@ -76,7 +78,7 @@ export default defineComponent({
     async selectTemplate(template) {
       try {
         const response = await axios.get(
-          "http://10.223.178.212:5173/getCertificateImageData",
+          "https://certificate-generation-server.onrender.com/getCertificateImageData",
           {
             params: {
               imagePath: template.image.slice(22).replace(/\//g, "\\"),
@@ -106,7 +108,10 @@ export default defineComponent({
         console.log(response.data);
 
         this.generatedSerts = response.data.map(
-          (img) => `http://10.223.178.212:5173${img.substring(1)}`
+          (img) =>
+            `https://certificate-generation-server.onrender.com${img.substring(
+              1
+            )}`
         );
 
         // const htmlTemplate = "";

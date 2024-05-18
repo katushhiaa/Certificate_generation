@@ -29,10 +29,12 @@ export default {
         const userId = localStorage.getItem("userId");
 
         const response = await axios.get(
-          `http://10.223.178.212:5173/getStudentCertificates?userId=${userId}`
+          `https://certificate-generation-server.onrender.com/getStudentCertificates?userId=${userId}`
         );
         this.sertificates = response.data.map(({ image }) => ({
-          image: `http://10.223.178.212:5173${image.substring(1)}`,
+          image: `https://certificate-generation-server.onrender.com${image.substring(
+            1
+          )}`,
           file: image,
         }));
       } catch (error) {
@@ -41,7 +43,7 @@ export default {
     },
     async downloadPdf(file) {
       const response = await axios.post(
-        `http://10.223.178.212:5173/generatePDF`,
+        `https://certificate-generation-server.onrender.com/generatePDF`,
         {
           studentCertificates: [file],
         },
