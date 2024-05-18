@@ -81,10 +81,11 @@ export default defineComponent({
           "https://certificate-generation-server.onrender.com/getCertificateImageData",
           {
             params: {
-              imagePath: template.image.slice(22).replace(/\//g, "\\"),
+              imagePath: template.image.match(/images\/(.*)/)[0],
             },
           }
         );
+
         const templateId = response.data.templateId;
         localStorage.setItem("selectedTemplateId", templateId);
         console.log("Selected template ID:", templateId);
