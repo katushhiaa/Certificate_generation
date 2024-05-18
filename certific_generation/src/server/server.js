@@ -6,15 +6,16 @@ import path from "path";
 import fs from "fs";
 import nodeHtmlToImage from "node-html-to-image";
 import PDFDocument from "pdfkit";
-import { MongoClient, ServerApiVersion } from "mongodb";
 
 const app = express();
 
 app.use(cors());
 
 mongoose.connect(
-  "mongodb+srv://kanurevamail:0x02G24YUd6AFGbe@dimplom-cluster.yc8oa4y.mongodb.net/?retryWrites=true&w=majority&appName=Dimplom-cluster"
+  "mongodb+srv://kanurevamail:0x02G24YUd6AFGbe@dimplom-cluster.yc8oa4y.mongodb.net/?retryWrites=true&w=majority&appName=Dimplom-cluster/database"
 );
+
+// mongoose.connect("mongodb://localhost:27017/database");
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
