@@ -12,33 +12,9 @@ const app = express();
 
 app.use(cors());
 
-// Replace the following with your Atlas connection string
-/*const url =
-  "mongodb+srv://kanurevamail:<0x02G24YUd6AFGbe>@dimplom-cluster.yc8oa4y.mongodb.net/?retryWrites=true&w=majority&appName=Dimplom-cluster";
-
-const client = new MongoClient(url, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-});
-
-async function run() {
-  try {
-    await client.connect();
-    await client.db("admin").command({ ping: 1 });
-    console.log("Successfully connected to Atlas");
-  } catch (err) {
-    console.log(err.stack);
-  } finally {
-    await client.close();
-  }
-}
-
-run().catch(console.dir);*/
-
-mongoose.connect("mongodb://localhost:27017/database");
+mongoose.connect(
+  "mongodb+srv://kanurevamail:0x02G24YUd6AFGbe@dimplom-cluster.yc8oa4y.mongodb.net/?retryWrites=true&w=majority&appName=Dimplom-cluster"
+);
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
