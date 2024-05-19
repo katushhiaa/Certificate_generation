@@ -17,7 +17,7 @@
                 style="display: none"
                 name="image"
               />
-              <span class="custom-button">Вибрати свій</span>
+              <span class="custom-button">Вибрати Зображення</span>
             </label>
           </div>
 
