@@ -1,11 +1,7 @@
 <template>
   <div id="app" class="main-container">
     <navComp />
-    <div>
-      <div>
-        <router-view></router-view>
-      </div>
-    </div>
+    <router-view></router-view>
     <footerComp />
   </div>
 </template>

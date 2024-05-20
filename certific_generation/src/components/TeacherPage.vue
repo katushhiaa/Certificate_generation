@@ -15,7 +15,6 @@
                 show-select
                 :pagination="true"
               ></v-data-table>
-              <pre>{{ selectedStudents }}</pre>
             </div>
           </div>
         </div>

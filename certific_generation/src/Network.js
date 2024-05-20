@@ -2,7 +2,8 @@ import axios from "axios";
 
 class Network {
   constructor() {
-    this.baseUrl = "https://certificate-generation-server.onrender.com";
+    // this.baseUrl = "https://certificate-generation-server.onrender.com";
+    this.baseUrl = "http://localhost:3001";
   }
 
   signUp(data) {
@@ -41,7 +42,32 @@ class Network {
     return axios.post(`${this.baseUrl}/generateCertificate`, data);
   }
 
-  getAll() {
+  async getTemplates() {
+    return axios.get(`${this.baseUrl}/templates`);
+  }
+
+  async getCertificateImageData(params) {
+    return await axios.get(`${this.baseUrl}/getCertificateImageData`, {
+      params,
+    });
+  }
+
+  async getStudentCertificates(params) {
+    return axios.get(`${this.baseUrl}/getStudentCertificates`, { params });
+  }
+
+  async generatePDF(data, config) {
+    return axios.post(`${this.baseUrl}/generatePDF`, data, config);
+  }
+
+  getPath() {
+    return this.baseUrl;
+  }
+
+  get path() {
+    return this.baseUrl;
+  }
+  /*getAll() {
     return axios.get(`${this.baseUrl}/signup`);
   }
 
@@ -63,7 +89,7 @@ class Network {
 
   deleteAll() {
     return axios.delete(`${this.baseUrl}/signup`);
-  }
+  }*/
 }
 
 export default new Network();

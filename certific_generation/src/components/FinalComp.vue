@@ -1,8 +1,8 @@
 <template>
   <div class="final_wrapper">
-    <div class="carousel-wrapper">
+    <div v-if="hasTemplates()" class="carousel-wrapper">
       <div class="carousel">
-        <Carousel>
+        <Carousel @slide-start="handleSlideStart" @init="handleInit">
           <Slide v-for="template in templates" :key="template.image">
             <div class="carousel__item">
               <img
@@ -23,15 +23,32 @@
           @click="generateCertificate"
           type="submit"
           style="width: 250px; height: 50px; margin: 10px"
+          :disabled="isLoading"
+          class="generate-button"
         >
-          Згенерувати сертифікат
+          <span v-if="!isLoading">Згенерувати сертифікат</span>
+          <span v-if="isLoading">Зачекайте...</span>
+        </button>
+        <button
+          @click="createNewCertificate"
+          style="width: 250px; height: 50px; margin: 10px"
+        >
+          Додати Сертифікат
         </button>
       </div>
       <ul class="generated-sertificats">
         <li v-for="(image, idx) in generatedSerts" :key="idx">
-          <img :src="image" alt="Template" />
+          <img :src="'data:image/png;base64,' + image" alt="Template" />
         </li>
       </ul>
+    </div>
+    <div v-if="!hasTemplates()">
+      <button
+        @click="createNewCertificate"
+        style="width: 250px; height: 50px; margin: 10px"
+      >
+        Додати Сертифікат
+      </button>
     </div>
     <div id="certificate" v-html="htmlTemplate"></div>
   </div>
@@ -39,7 +56,6 @@
 
 <script>
 import { defineComponent } from "vue";
-import axios from "axios";
 import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
 import "vue3-carousel/dist/carousel.css";
 import Network from "@/Network";
@@ -57,38 +73,38 @@ export default defineComponent({
       templates: [],
       htmlTemplate: "",
       generatedSerts: [],
+      selectedTempate: "",
+      isLoading: false,
     };
   },
   created() {
-    this.fetchImages();
+    this.fetchTemplates();
   },
   methods: {
-    async fetchImages() {
+    handleInit() {
+      if (this.templates.length) {
+        this.selectTemplate(this.templates[0]);
+      }
+    },
+    handleSlideStart(data) {
+      this.selectTemplate(this.templates[data.slidingToIndex]);
+    },
+    hasTemplates() {
+      return this.templates.length;
+    },
+    async fetchTemplates() {
       try {
-        const response = await axios.get(
-          "https://certificate-generation-server.onrender.com/images"
-        );
-        this.templates = response.data.map((imagePath) => ({
-          image: `https://certificate-generation-server.onrender.com${imagePath}`,
-        }));
+        const response = await Network.getTemplates();
+        this.templates = response.data;
       } catch (error) {
-        console.error("Error fetching images:", error);
+        console.error("Error fetching templates:", error);
       }
     },
     async selectTemplate(template) {
       try {
-        const response = await axios.get(
-          "https://certificate-generation-server.onrender.com/getCertificateImageData",
-          {
-            params: {
-              imagePath: template.image.match(/images\/(.*)/)[0],
-            },
-          }
-        );
+        this.selectedTempate = template._id;
 
-        const templateId = response.data.templateId;
-        localStorage.setItem("selectedTemplateId", templateId);
-        console.log("Selected template ID:", templateId);
+        console.log("Selected template ID:", template._id);
       } catch (error) {
         console.error("Error selecting template:", error);
       }
@@ -97,30 +113,25 @@ export default defineComponent({
       const selectedStudents = JSON.parse(
         localStorage.getItem("selectedStudents")
       );
-      const selectedTemplateId = localStorage.getItem("selectedTemplateId");
       const CertData = JSON.parse(localStorage.getItem("CertData"));
 
       try {
+        this.isLoading = true;
         const response = await Network.generateCertificate({
           selectedStudents,
-          selectedTemplateId,
+          selectedTemplateId: this.selectedTempate,
           CertData,
         });
         console.log(response.data);
 
-        this.generatedSerts = response.data.map(
-          (img) =>
-            `https://certificate-generation-server.onrender.com${img.substring(
-              1
-            )}`
-        );
-
-        // const htmlTemplate = "";
-
-        // this.htmlTemplate = htmlTemplate;
+        this.generatedSerts = response.data;
+        this.isLoading = false;
       } catch (error) {
         console.error(error);
       }
+    },
+    createNewCertificate() {
+      this.$router.push("/createCertificate");
     },
   },
 });
@@ -134,7 +145,6 @@ export default defineComponent({
 }
 
 .final_wrapper {
-  width: 1500px;
   margin: 0 auto;
   display: flex;
   flex-direction: row;
@@ -167,5 +177,9 @@ export default defineComponent({
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.input-box.button button.generate-button:disabled {
+  background: #555;
 }
 </style>

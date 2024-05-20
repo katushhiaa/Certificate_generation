@@ -9,15 +9,7 @@
         <div class="input-box" style="top: 280px">
           <div>
             <label for="file-upload" class="input-box button">
-              <input
-                id="file-upload"
-                type="file"
-                ref="file"
-                @change="chooseTemplate"
-                style="display: none"
-                name="image"
-              />
-              <span class="custom-button">Вибрати Зображення</span>
+              <v-file-input outlined label="File" v-model="image" />
             </label>
           </div>
 
@@ -41,7 +33,7 @@
         </div>
         <div class="default-word-position"></div>
         <div class="template-container">
-          <img v-if="templateImage" :src="templateImage" alt="Template Image" />
+          <img v-if="base64" :src="base64" alt="Template Image" />
           <div class="movable-words">
             <div
               v-for="(word, index) in words"
@@ -74,7 +66,8 @@ import axios from "axios";
 export default {
   data() {
     return {
-      templateImage: "",
+      image: null,
+      base64: null,
       words: [
         { text: "Student", top: 0, left: -230, color: "#000000", font: 18 },
         {
@@ -99,6 +92,15 @@ export default {
   components: {
     ColorPicker,
   },
+  watch: {
+    image: function (newVal, oldVal) {
+      if (newVal) {
+        this.createBase64Image(newVal);
+      } else {
+        this.base64 = null;
+      }
+    },
+  },
   methods: {
     startDrag(index, event) {
       this.dragging = true;
@@ -107,6 +109,13 @@ export default {
       this.offsetY = event.clientY - this.words[index].top;
       document.addEventListener("mousemove", this.drag);
       document.addEventListener("mouseup", this.endDrag);
+    },
+    createBase64Image: function (FileObject) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        this.base64 = event.target.result;
+      };
+      reader.readAsDataURL(FileObject);
     },
     drag(event) {
       if (this.dragging) {
@@ -131,25 +140,13 @@ export default {
     },
     inputFocus() {},
     inputBlur() {},
-    chooseTemplate(event) {
-      const file = this.$refs.file.files[0];
-      console.log("file", file);
-      this.file = file;
-      this.templateImage = URL.createObjectURL(file);
-    },
     async saveTemplate() {
-      const formData = new FormData();
-      formData.append("image", this.file);
-      console.log("Ім'я зображення:", this.templateImage);
       console.log("Координати з кольорами всіх полів:");
       this.words.forEach((word) => {
         console.log(
           `${word.text} - Координати: (${word.top}, ${word.left}), Колір: ${word.color}`
         );
       });
-      const res = await Network.uploadFile(formData);
-      console.log("img res", res);
-
       const response = await Network.saveTemplateData({
         studentName_color: this.words[0].color,
         studentName_top: this.words[0].top,
@@ -166,7 +163,7 @@ export default {
         dateOfGiving_color: this.words[4].color,
         dateOfGiving_top: this.words[4].top,
         dateOfGiving_left: this.words[4].left,
-        imagePath: res.data.imagePath,
+        image: this.base64,
       });
 
       console.log(response.data);
@@ -190,7 +187,7 @@ export default {
 
 .template-container {
   position: relative;
-
+  user-select: none;
   width: 900px;
   height: 400px;
 }

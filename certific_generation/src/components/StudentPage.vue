@@ -1,65 +1,57 @@
 <template>
   <ul class="certificates">
     <li
-      v-for="({ image, file }, idx) in sertificates"
+      v-for="(certificate, idx) in certificates"
       :key="idx"
-      @click="downloadPdf(file)"
+      @click="downloadPdf(certificate)"
     >
-      <img :src="image" alt="Template" />
+      <img :src="'data:image/png;base64,' + certificate" alt="Certificate" />
     </li>
   </ul>
 </template>
 
 <script>
-import axios from "axios";
+import Network from "@/Network";
 
 export default {
   name: "StudentComp",
   data() {
     return {
-      sertificates: [],
+      certificates: [],
     };
   },
   created() {
-    this.fetchSertificates();
+    this.fetchCertificates();
   },
   methods: {
-    async fetchSertificates() {
+    async fetchCertificates() {
       try {
         const userId = localStorage.getItem("userId");
 
-        const response = await axios.get(
-          `https://certificate-generation-server.onrender.com/getStudentCertificates?userId=${userId}`
-        );
-        this.sertificates = response.data.map(({ image }) => ({
-          image: `https://certificate-generation-server.onrender.com${image.substring(
-            1
-          )}`,
-          file: image,
-        }));
+        const response = await Network.getStudentCertificates({ userId });
+        this.certificates = response.data.map(({ image }) => image);
       } catch (error) {
-        console.error("Error fetching images:", error);
+        console.error("Error fetching certificates:", error);
       }
     },
-    async downloadPdf(file) {
-      const response = await axios.post(
-        `https://certificate-generation-server.onrender.com/generatePDF`,
-        {
-          studentCertificates: [file],
-        },
-        {
-          responseType: "blob",
-        }
-      );
-      const blob = new Blob([response.data], { type: "application/pdf" });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "studentCertificates.pdf");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+    async downloadPdf(image) {
+      try {
+        const response = await Network.generatePDF(
+          { studentCertificates: [image] },
+          { responseType: "blob" }
+        );
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "studentCertificates.pdf");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error("Error downloading PDF:", error);
+      }
     },
   },
 };

@@ -10,6 +10,8 @@ import PDFDocument from "pdfkit";
 const app = express();
 
 app.use(cors());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb" }));
 
 mongoose.connect(
   "mongodb+srv://kanurevamail:0x02G24YUd6AFGbe@dimplom-cluster.yc8oa4y.mongodb.net/?retryWrites=true&w=majority&appName=Dimplom-cluster/database"
@@ -59,7 +61,7 @@ const templateSchema = new mongoose.Schema({
   dateOfGiving_color: String,
   dateOfGiving_top: Number,
   dateOfGiving_left: Number,
-  imagePath: String,
+  image: String,
 });
 
 const User = mongoose.model("users", userSchema);
@@ -78,7 +80,7 @@ const fileStorage = multer.diskStorage({
 
 const upload = multer({ storage: fileStorage });
 
-app.post("/upload", upload.single("image"), (req, res) => {
+/*app.post("/upload", upload.single("image"), (req, res) => {
   console.log(req.file);
   res.json({
     imagePath: req.file.path,
@@ -88,7 +90,7 @@ app.post("/upload", upload.single("image"), (req, res) => {
 const imagesFolderPath = path.resolve("images");
 app.use("/images", express.static(imagesFolderPath));
 
-app.get("/images", (req, res) => {
+/*app.get("/images", (req, res) => {
   const directoryPath = imagesFolderPath;
   fs.readdir(directoryPath, (err, files) => {
     if (err) {
@@ -97,6 +99,16 @@ app.get("/images", (req, res) => {
     const imagePaths = files.map((file) => `/images/${file}`);
     res.json(imagePaths);
   });
+});*/
+
+app.get("/templates", async (req, res) => {
+  try {
+    const templates = await Template.find();
+    res.status(200).json(templates);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Помилка сервера" });
+  }
 });
 
 const sertificatesFolderPath = path.resolve("sertificates");
@@ -179,7 +191,7 @@ app.post("/saveTemplateData", async (req, res) => {
     dateOfGiving_color,
     dateOfGiving_top,
     dateOfGiving_left,
-    imagePath,
+    image,
   } = req.body;
   try {
     const newTemplate = new Template({
@@ -198,30 +210,30 @@ app.post("/saveTemplateData", async (req, res) => {
       dateOfGiving_color,
       dateOfGiving_top,
       dateOfGiving_left,
-      imagePath,
+      image,
     });
     console.log(newTemplate);
     await newTemplate.save();
-    res.status(200).json({ message: "Дані успішно збережено", imagePath });
+    res.status(200).json({ message: "Дані успішно збережено", image });
   } catch (error) {
     console.error("Помилка збереження даних:", error);
     res.status(500).json({ error: "Помилка сервера" });
   }
 });
 
-app.get("/getCertificateImageData", async (req, res) => {
-  try {
-    const imagePath = req.query.imagePath;
-    const template = await Template.findOne({ imagePath: imagePath });
-    if (!template) {
-      return res.status(404).json({ error: "Template not found" });
-    }
-    res.status(200).json({ templateId: template._id });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
+// app.get("/getCertificateImageData", async (req, res) => {
+//   try {
+//     const templateId = req.body.templateId;
+//     const template = await Template.findById(templateId);
+//     if (!template) {
+//       return res.status(404).json({ error: "Template not found" });
+//     }
+//     res.status(200).json({ templateId: template._id });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
 
 app.post("/generateCertificate", async (req, res) => {
   const { CertData } = req.body;
@@ -234,119 +246,119 @@ app.post("/generateCertificate", async (req, res) => {
 
     const templateId = req.body.selectedTemplateId;
     const template = await Template.findById(templateId);
+    if (template.image) {
+      const dataURI = template.image;
+      let studentsCnt = selectedStudents.length;
+      const sertificates = [];
+      selectedStudents.forEach((student) => {
+        console.log(`Creating the sertificate for ${student.name}`);
 
-    const image = fs.readFileSync(template.imagePath);
-    const base64Image = new Buffer.from(image).toString("base64");
-    const dataURI = "data:image/jpeg;base64," + base64Image;
-
-    let studentsCnt = selectedStudents.length;
-    const sertificates = [];
-    selectedStudents.forEach((student) => {
-      console.log(`Creating the sertificate for ${student.name}`);
-
-      const html = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Certificate Template</title>
-        <style>
-            body {
-              font-family: Arial, sans-serif;
-              text-align: center;
-              width: 900px;
-              height: 400px;
-            }
-            .certificate {
-              width: 900px;
-              height: 400px;
-            }
-            .certificate .title {
-                position: absolute;                  
-                font-size: 24px;
-                color: ${template.title_color};
-                top: ${template.title_top}px;
-                left: ${template.title_left}px;
+        const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Certificate Template</title>
+          <style>
+              body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                width: 900px;
+                height: 400px;
+              }
+              .certificate {
+                width: 900px;
+                height: 400px;
+              }
+              .certificate .title {
+                  position: absolute;                  
+                  font-size: 24px;
+                  color: ${template.title_color};
+                  top: ${template.title_top}px;
+                  left: ${template.title_left}px;
+                  z-index: 999;
+              }
+              .certificate .duration {
+                  position: absolute; 
+                  font-size: 18px;
+                  color: ${template.duration_color};
+                  top: ${template.duration_top}px;
+                  left: ${template.duration_left}px;
+                  z-index:999
+              }
+              .certificate .teacher {
+                  position: absolute; 
+                  font-size: 18px;
+                  color: ${template.teacherSurname_color};
+                  top: ${template.teacherSurname_top}px;
+                  left: ${template.teacherSurname_left}px;
+                  z-index:999
+              }
+              .certificate .student {
+                position: absolute; 
+                font-size: 18px;
+                color: ${template.studentName_color};
+                top: ${template.studentName_top}px;
+                left: ${template.studentName_left}px;
                 z-index: 999;
             }
-            .certificate .duration {
-                position: absolute; 
-                font-size: 18px;
-                color: ${template.duration_color};
-                top: ${template.duration_top}px;
-                left: ${template.duration_left}px;
-                z-index:999
-            }
-            .certificate .teacher {
-                position: absolute; 
-                font-size: 18px;
-                color: ${template.teacherSurname_color};
-                top: ${template.teacherSurname_top}px;
-                left: ${template.teacherSurname_left}px;
-                z-index:999
-            }
-            .certificate .student {
+            .certificate .givingDate {
               position: absolute; 
               font-size: 18px;
-              color: ${template.studentName_color};
-              top: ${template.studentName_top}px;
-              left: ${template.studentName_left}px;
+              color: ${template.dateOfGiving_color};
+              top: ${template.dateOfGiving_top}px;
+              left: ${template.dateOfGiving_left}px;
               z-index: 999;
           }
-          .certificate .givingDate {
-            position: absolute; 
-            font-size: 18px;
-            color: ${template.dateOfGiving_color};
-            top: ${template.dateOfGiving_top}px;
-            left: ${template.dateOfGiving_left}px;
-            z-index: 999;
-        }
-          .cert-picture{
-            position: relative;
-            width: 900px;
-            height: 400px;
-          }
-        </style>
-    </head>
-    <body>
-        <div class="certificate">
-          <div class="title">${CertData.title}</div>
-          <div class="duration">${CertData.duration}</div>
-          <div class="teacher">${CertData.teacherSurname}</div>
-          <div class="student">${student.name}</div>
-          <div class="givingDate">${CertData.dateOfGiving}</div>
-          <img class="cert-picture" src="{{imageSource}}"  alt="Certificate Template">
-        </div>
-    </body>
-    </html>
-`;
+            .cert-picture{
+              position: relative;
+              width: 900px;
+              height: 400px;
+            }
+          </style>
+      </head>
+      <body>
+          <div class="certificate">
+            <div class="title">${CertData.title}</div>
+            <div class="duration">${CertData.duration}</div>
+            <div class="teacher">${CertData.teacherSurname}</div>
+            <div class="student">${student.name}</div>
+            <div class="givingDate">${CertData.dateOfGiving}</div>
+            <img class="cert-picture" src="{{imageSource}}"  alt="Certificate Template">
+          </div>
+      </body>
+      </html>
+  `;
 
-      const sertPath = `./sertificates/${student.id}.png`;
-      sertificates.push(sertPath);
-      nodeHtmlToImage({
-        output: sertPath,
-        html,
-        content: { imageSource: dataURI },
-      }).then(async () => {
-        console.log(`The image for ${student.name} was created successfully!`);
-        const newCertificate = new Certificate({
-          studentId: student.id,
-          templateId: template.id,
-          image: sertPath,
-          // title: CertData.title,
-          // duration: CertData.duration,
-          // teacherSurname: CertData.teacherSurname,
-          // dateOfGiving: CertData.dateOfGiving,
+        nodeHtmlToImage({
+          html,
+          content: { imageSource: dataURI },
+          encoding: "buffer",
+        }).then(async (imageBuffer) => {
+          const base64Image = imageBuffer.toString("base64");
+          console.log(
+            `The image for ${student.name} was created successfully!`
+          );
+          const newCertificate = new Certificate({
+            studentId: student.id,
+            templateId: template.id,
+            image: base64Image,
+            // title: CertData.title,
+            // duration: CertData.duration,
+            // teacherSurname: CertData.teacherSurname,
+            // dateOfGiving: CertData.dateOfGiving,
+          });
+          await newCertificate.save();
+          sertificates.push(base64Image);
+          //console.log(html);
+          studentsCnt--;
+          if (studentsCnt <= 0) {
+            res.status(200).json(sertificates);
+          }
         });
-        await newCertificate.save();
-        //console.log(html);
-        studentsCnt--;
-        if (studentsCnt <= 0) {
-          res.status(200).json(sertificates);
-        }
       });
-    });
+    }
   } catch (error) {
     console.error("Error generating certificate:", error);
   }
@@ -369,16 +381,14 @@ app.get("/getStudentCertificates", async (req, res) => {
 app.post("/generatePDF", async (req, res) => {
   try {
     const studentCertificates = req.body.studentCertificates;
-
     const doc = new PDFDocument({
       layout: "landscape",
     });
-
     const writeStream = fs.createWriteStream("studentCertificates.pdf");
     doc.pipe(writeStream);
-
     studentCertificates.forEach((certificatePath, index) => {
-      doc.image(certificatePath, {
+      const imageBuffer = Buffer.from(certificatePath, "base64");
+      doc.image(imageBuffer, {
         width: 900,
         height: 400,
         cover: [doc.page.width - 100, doc.page.height - 300],
@@ -389,7 +399,6 @@ app.post("/generatePDF", async (req, res) => {
         });
       }
     });
-
     doc.end();
     writeStream.on("finish", function () {
       res.download("studentCertificates.pdf");
