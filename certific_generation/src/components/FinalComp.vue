@@ -47,7 +47,7 @@
         @click="createNewCertificate"
         style="width: 250px; height: 50px; margin: 10px"
       >
-        Додати Сертифікат
+        Додати сертифікат
       </button>
     </div>
     <div id="certificate" v-html="htmlTemplate"></div>
