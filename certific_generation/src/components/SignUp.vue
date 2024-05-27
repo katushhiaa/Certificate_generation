@@ -3,38 +3,32 @@
     <div class="form-wrapper">
       <h2>Реєстрація</h2>
       <form @submit.prevent="submitForm">
-        <div class="input-box">
-          <input
-            type="text"
-            v-model="name"
-            placeholder="Введіть свій логін"
-            required
-          />
-        </div>
-        <div class="input-box">
-          <input
-            type="email"
-            v-model="email"
-            placeholder="Введіть свою електронну пошту"
-            required
-          />
-        </div>
-        <div class="input-box">
-          <input
-            type="password"
-            v-model="password"
-            placeholder="Створіть пароль"
-            required
-          />
-        </div>
-        <div class="input-box">
-          <input
-            type="password"
-            v-model="confirmPassword"
-            placeholder="Підвердіть пароль"
-            required
-          />
-        </div>
+        <v-text-field
+          v-model="name"
+          :rules="nameRules"
+          label="Введіть своє ім'я та прізвище"
+          required
+        ></v-text-field>
+        <v-text-field
+          v-model="email"
+          :rules="emailRules"
+          label="Введіть свою електронну пошту"
+          required
+        ></v-text-field>
+        <v-text-field
+          v-model="password"
+          :rules="passwordRules"
+          label="Створіть пароль"
+          type="password"
+          required
+        ></v-text-field>
+        <v-text-field
+          v-model="confirmPassword"
+          :rules="confirmPasswordRules"
+          label="Підвердіть пароль"
+          type="password"
+          required
+        ></v-text-field>
         <div class="role-selection">
           <input
             type="radio"
@@ -50,18 +44,36 @@
             id="student"
             v-model="role"
             value="student"
-            class="text"
+            class="form-radio"
           />
           <label for="student">Я студент</label>
+          <div v-if="!roleValid" class="error-message">Role is required</div>
         </div>
         <div class="input-box button">
           <button type="submit">Зареєструватись</button>
         </div>
+        <v-snackbar
+          v-model="showSnackbar"
+          :timeout="snackbarTimeout"
+          top
+          color="red"
+        >
+          {{ snackbarMessage }}
+          <template v-slot:action="{ attrs }">
+            <v-btn
+              color="white"
+              text
+              v-bind="attrs"
+              @click="showSnackbar = false"
+            >
+              Close
+            </v-btn>
+          </template>
+        </v-snackbar>
         <div class="text">
           <h3>
-            Вже маєте акаунт?<a href="#" @click="redirectToLogin"
-              >Увійдіть в нього</a
-            >
+            Вже маєте акаунт?
+            <router-link to="/login">Увійдіть в нього</router-link>
           </h3>
         </div>
       </form>
@@ -71,6 +83,12 @@
 
 <script>
 import Network from "@/Network";
+import {
+  nameRules,
+  emailRules,
+  passwordRules,
+  confirmPasswordRules,
+} from "@/utils/signUpFormRules";
 
 export default {
   name: "RegistrationForm",
@@ -81,38 +99,29 @@ export default {
       password: "",
       confirmPassword: "",
       role: "",
+      roleValid: true,
+      errorMessage: "",
+      showSnackbar: false,
+      snackbarMessage: "",
+      snackbarTimeout: 6000,
+      nameRules,
+      emailRules,
+      passwordRules,
     };
+  },
+  computed: {
+    confirmPasswordRules() {
+      return confirmPasswordRules(this.password);
+    },
   },
   methods: {
     async submitForm() {
-      console.log("Form submitted with data:", {
-        name: this.name,
-        email: this.email,
-        password: this.password,
-        role: this.role,
-      });
-
-      if (this.password !== this.confirmPassword) {
-        alert("Passwords do not match.");
+      this.roleValid = !!this.role;
+      if (!this.roleValid) {
         return;
       }
-
-      if (!this.role) {
-        alert("Please select a role.");
-        return;
-      }
-
-      if (this.password.length < 6) {
-        alert("Password must be at least 6 characters long.");
-        return;
-      }
-
-      if (this.role === "teacher") {
-        this.$router.push("/teacher");
-      } else if (this.role === "student") {
-        this.$router.push("/student");
-      }
-
+      this.errorMessage = "";
+      this.showSnackbar = false;
       try {
         const response = await Network.signUp({
           name: this.name,
@@ -121,13 +130,59 @@ export default {
           role: this.role,
         });
         console.log(response.data);
+        this.snackbarMessage = "User registered successfully";
+        this.showSnackbar = true;
+        if (this.role === "teacher") {
+          this.$router.push("/teacher");
+        } else if (this.role === "student") {
+          this.$router.push("/student");
+        }
       } catch (error) {
-        console.error(error.response.data);
+        console.error("Error during signup:", error.response.data);
+        if (error.response && error.response.status === 400) {
+          this.snackbarMessage = error.response.data.message;
+        } else {
+          this.snackbarMessage = "An error occurred. Please try again.";
+        }
+        this.showSnackbar = true;
       }
-    },
-    redirectToLogin() {
-      this.$router.push("/login");
     },
   },
 };
 </script>
+
+<style scoped>
+:deep(
+    .v-input--density-default
+      .v-field--variant-solo
+      .v-label.v-field-label--floating
+  ),
+:deep(
+    .v-input--density-default
+      .v-field--variant-solo-inverted
+      .v-label.v-field-label--floating
+  ),
+:deep(
+    .v-input--density-default
+      .v-field--variant-filled
+      .v-label.v-field-label--floating
+  ),
+:deep(
+    .v-input--density-default
+      .v-field--variant-solo-filled
+      .v-label.v-field-label--floating
+  ) {
+  top: -2px !important;
+}
+
+.v-selection-control-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: center !important;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+}
+</style>

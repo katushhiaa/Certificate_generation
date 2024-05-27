@@ -14,4 +14,9 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.bg-dark {
+  --mdb-bg-opacity: 1;
+  background-color: rgb(56 66 79) !important;
+}
+</style>

@@ -62,6 +62,7 @@ const templateSchema = new mongoose.Schema({
   dateOfGiving_top: Number,
   dateOfGiving_left: Number,
   image: String,
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
 });
 
 const User = mongoose.model("users", userSchema);
@@ -102,8 +103,11 @@ app.use("/images", express.static(imagesFolderPath));
 });*/
 
 app.get("/templates", async (req, res) => {
+  const { userId } = req.query;
   try {
-    const templates = await Template.find();
+    const templates = await Template.find({
+      $or: [{ createdBy: userId }, { createdBy: null }],
+    });
     res.status(200).json(templates);
   } catch (error) {
     console.error(error);
@@ -130,32 +134,34 @@ let certificates = [];
 
 app.use(express.json());
 
-app.post("/signup", async (req) => {
+app.post("/signup", async (req, res) => {
   const { name, email, password, role } = req.body;
   try {
     const existingUser = await User.findOne({ email: email });
     if (existingUser) {
-      return console.log("Користувач з цією електронною адресою вже існує");
+      return res.status(400).json({ message: "Цей email вже існує" });
+    } else {
+      const newUser = new User({ name, email, password, role });
+      await newUser.save();
+      return res.status(201).json({ message: "User registered successfully" });
     }
-    const newUser = new User({ name, email, password, role });
-    console.log(newUser);
-    await newUser.save();
-    console.log("User registered successfully");
   } catch (error) {
-    console.error(error);
+    console.error("Error during signup:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
 app.post("/login", async (req, res) => {
-  const { name, password, role } = req.body;
+  const { email, password } = req.body;
   try {
-    const user = await User.findOne({ name, password, role });
+    const user = await User.findOne({ email, password });
     if (user) {
       console.log("Вхід успішний", user);
+      res.status(200).json({ userId: user._id, role: user.role });
     } else {
-      console.log("Неправильні дані входу");
+      return res.status(400).json({ message: "Такого акаунту не існує" });
     }
-    if (user.role === "student") {
+    if (user.role === "student" || user.role === "teacher") {
       res.status(200).json({ userId: user._id });
     }
   } catch (error) {
@@ -192,6 +198,7 @@ app.post("/saveTemplateData", async (req, res) => {
     dateOfGiving_top,
     dateOfGiving_left,
     image,
+    createdBy,
   } = req.body;
   try {
     const newTemplate = new Template({
@@ -211,8 +218,8 @@ app.post("/saveTemplateData", async (req, res) => {
       dateOfGiving_top,
       dateOfGiving_left,
       image,
+      createdBy,
     });
-    console.log(newTemplate);
     await newTemplate.save();
     res.status(200).json({ message: "Дані успішно збережено", image });
   } catch (error) {

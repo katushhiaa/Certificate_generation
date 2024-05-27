@@ -20,6 +20,7 @@ export default {
 </script>
 
 <style>
+/* General styles */
 @import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap");
 * {
   margin: 0;
@@ -33,7 +34,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f3836b !important;
+  background-color: #7092aa !important;
 }
 
 .wrapper {
@@ -42,19 +43,15 @@ body {
 
 .form-wrapper {
   position: relative;
-  width: 90%;
   background: #fff;
   padding: 34px;
   border-radius: 6px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  height: 350;
+  width: 100%;
+  max-width: 430px;
+  margin: 75px;
 }
 
-@media screen and (min-width: 768px) {
-  .form-wrapper {
-    width: 430px;
-  }
-}
 .form-wrapper h2 {
   position: relative;
   font-size: 22px;
@@ -122,13 +119,9 @@ form h3 {
   color: #fff;
   border: none;
   border-radius: 6px;
-  background: #ab4c37;
+  background: #575b6b;
   cursor: pointer;
   transition: background 0.3s ease;
-}
-
-.input-box.button button:hover {
-  background: #ab4c37;
 }
 
 form .text h3 {
@@ -149,57 +142,101 @@ label {
   padding: 8px 0;
 }
 
-.role-selection {
-  margin-bottom: 15px;
-  color: #000000;
-}
-
-.role-selection input[type="radio"] {
-  margin: 5px;
-}
-
-.text-teacher {
-  color: black;
-  font-family: "Poppins", sans-serif;
-}
-
 .teacherContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 20px;
-  max-width: 800px;
 }
 
 .students-container {
-  width: auto;
-  height: auto;
+  width: 100%;
+  max-width: 430px;
+  margin: 75px;
 }
 
-@media screen and (min-width: 768px) {
-  .students-container {
-    width: 430px;
-    padding-right: 50px;
-  }
+.form-radio {
+  margin-left: 10px;
 }
 
-@media (max-width: 767px) {
-  /* Adjust styles for smaller screens */
-  .form-wrapper {
-    width: 90%;
-    margin: 50px 0;
-  }
-}
-
-@media (min-width: 768px) {
-  /* Adjust styles for medium and larger screens */
-  .form-wrapper {
-    width: 430px;
-    margin: 75px 0;
-  }
+.carousel-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 0 auto;
 }
 
 /*.main-container {
   width: 650px;
   margin: 0 auto;
 }*/
+
+:deep(
+    .v-input--density-default
+      .v-field--variant-solo
+      .v-label.v-field-label--floating
+  ),
+:deep(
+    .v-input--density-default
+      .v-field--variant-solo-inverted
+      .v-label.v-field-label--floating
+  ),
+:deep(
+    .v-input--density-default
+      .v-field--variant-filled
+      .v-label.v-field-label--floating
+  ),
+:deep(
+    .v-input--density-default
+      .v-field--variant-solo-filled
+      .v-label.v-field-label--floating
+  ) {
+  top: -2px !important;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 0.5em;
+}
+
+@media (max-width: 767px) {
+  .form-wrapper {
+    width: 90%;
+    padding: 20px;
+    margin: 75px 20px;
+  }
+  .students-container {
+    width: 100%;
+    padding: 0 20px;
+    margin: 20px auto;
+  }
+  .teacherContainer {
+    flex-direction: column;
+  }
+  .form-radio {
+    margin-left: 10px;
+  }
+  .final_wrapper .carousel-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 0;
+  }
+
+  .input-box {
+    flex-direction: column;
+  }
+  .main-container .final_wrapper {
+    display: block;
+  }
+
+  body {
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    padding-top: 90px;
+  }
+}
 </style>

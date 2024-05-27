@@ -141,6 +141,7 @@ export default {
     inputFocus() {},
     inputBlur() {},
     async saveTemplate() {
+      const userId = localStorage.getItem("userId");
       console.log("Координати з кольорами всіх полів:");
       this.words.forEach((word) => {
         console.log(
@@ -164,6 +165,7 @@ export default {
         dateOfGiving_top: this.words[4].top,
         dateOfGiving_left: this.words[4].left,
         image: this.base64,
+        createdBy: userId,
       });
 
       console.log(response.data);

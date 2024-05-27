@@ -31,7 +31,8 @@
 </template>
 
 <script>
-import Network from "../Network"; // Adjust the import path as needed
+import Network from "../Network";
+import { nameRules, emailRules, passwordRules } from "@/utils/signUpFormRules";
 
 export default {
   name: "AddStudent",
@@ -41,31 +42,9 @@ export default {
       name: "",
       email: "",
       password: "",
-      nameRules: [
-        (v) => !!v || "Ім'я та прізвище обов'язкові",
-        (v) =>
-          /^[a-zA-Zа-яА-Я\s]+$/.test(v) || "Тільки літери дозволені в імені",
-      ],
-      emailRules: [
-        (v) => !!v || "Email обов'язковий",
-        (v) =>
-          /.+@.+\..+/.test(v) ||
-          "Email повинен мати вигляд: example@gmail.com ",
-      ],
-      passwordRules: [
-        (v) => !!v || "Пароль обовязковий",
-        (v) => v.length >= 8 || "Пароль повинен бути більше ніж 8 символів",
-        (v) =>
-          /[A-Z]/.test(v) ||
-          "Пароль повинен містити принаймні одну велику літеру",
-        (v) =>
-          /[a-z]/.test(v) ||
-          "Пароль повинен містити принаймні одну малу літеру",
-        (v) => /[0-9]/.test(v) || "Пароль повинен містити принаймні одну цифру",
-        (v) =>
-          /[\W_]/.test(v) ||
-          "Пароль повинен містити принаймні один спеціальний символ",
-      ],
+      nameRules,
+      emailRules,
+      passwordRules,
     };
   },
   methods: {
@@ -79,14 +58,42 @@ export default {
         });
         if (response.status === 201) {
           this.modalShow = false;
-        } else {
-          alert("Registration failed");
         }
       } catch (error) {
         console.error("Error during registration:", error);
-        alert("Server error");
       }
     },
   },
 };
 </script>
+
+<style scoped>
+:deep(
+    .v-input--density-default
+      .v-field--variant-solo
+      .v-label.v-field-label--floating
+  ),
+:deep(
+    .v-input--density-default
+      .v-field--variant-solo-inverted
+      .v-label.v-field-label--floating
+  ),
+:deep(
+    .v-input--density-default
+      .v-field--variant-filled
+      .v-label.v-field-label--floating
+  ),
+:deep(
+    .v-input--density-default
+      .v-field--variant-solo-filled
+      .v-label.v-field-label--floating
+  ) {
+  top: -2px !important;
+}
+
+.v-selection-control-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: center !important;
+}
+</style>

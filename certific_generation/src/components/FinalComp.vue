@@ -94,7 +94,8 @@ export default defineComponent({
     },
     async fetchTemplates() {
       try {
-        const response = await Network.getTemplates();
+        const userId = localStorage.getItem("userId");
+        const response = await Network.getTemplates({ userId });
         this.templates = response.data;
       } catch (error) {
         console.error("Error fetching templates:", error);

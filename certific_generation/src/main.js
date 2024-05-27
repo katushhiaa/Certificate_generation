@@ -8,6 +8,7 @@ import "@mdi/font/css/materialdesignicons.css";
 import "vuetify/styles";
 import { createVuetify } from "vuetify";
 import { VDataTable } from "vuetify/components/VDataTable";
+import "mdb-vue-ui-kit/css/mdb.min.css";
 
 const app = createApp(App);
 

@@ -1,13 +1,19 @@
 <template>
-  <b-navbar toggleable="lg" type="dark" variant="info" class="fixed-top">
+  <b-navbar
+    toggleable="lg"
+    type="dark"
+    variant="info"
+    class="fixed-top"
+    style="background-color: rgb(146 164 178) !important"
+  >
     <b-navbar-brand>Генератор сертифікатів</b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
-        <b-nav-item href="#">Контакти</b-nav-item>
-        <b-nav-item href="#">Інструкція з використання</b-nav-item>
+        <b-nav-item href="#">Login</b-nav-item>
+        <b-nav-item href="#">Sign up</b-nav-item>
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>

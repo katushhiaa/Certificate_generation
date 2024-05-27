@@ -15,69 +15,77 @@
                 show-select
                 :pagination="true"
               ></v-data-table>
+              <AddStudent></AddStudent>
             </div>
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-wrapper">
             <h2>Введіть дані сертифікату</h2>
-            <form @submit.prevent="submitCertForm">
-              <div class="mb-3">
-                <input
-                  v-model="data.title"
-                  type="text"
-                  id="title"
-                  required
-                  class="form-control"
-                  placeholder="Назва заходу (участь в)"
-                />
-              </div>
-              <div class="mb-3">
-                <input
-                  v-model="data.duration"
-                  type="text"
-                  id="duration"
-                  required
-                  class="form-control"
-                  placeholder="Тривалість (Наприклад: 1 година)"
-                />
-              </div>
-              <div class="mb-3">
-                <input
-                  v-model="data.teacherSurname"
-                  type="text"
-                  id="surname-teacher"
-                  required
-                  class="form-control"
-                  placeholder="Прізвище та ініціали викладача, який проводив захід"
-                />
-              </div>
-              <div class="mb-3">
-                <input
-                  v-model="data.dateOfGiving"
-                  type="date"
-                  id="dateOfGiving"
-                  required
-                  class="form-control"
-                  placeholder="Введіть дату видачі"
-                />
-              </div>
+            <v-form ref="certForm" @submit.prevent="submitCertForm">
+              <v-text-field
+                v-model="data.title"
+                :rules="titleRules"
+                label="Назва заходу (участь в)"
+                required
+              ></v-text-field>
+              <v-text-field
+                v-model="data.duration"
+                :rules="durationRules"
+                label="Тривалість (Наприклад: 1 година)"
+                required
+              ></v-text-field>
+              <v-text-field
+                v-model="data.teacherSurname"
+                :rules="teacherSurnameRules"
+                label="Прізвище та ініціали викладача, який проводив захід"
+                required
+              ></v-text-field>
+              <v-text-field
+                v-model="data.dateOfGiving"
+                :rules="dateOfGivingRules"
+                label="Оберіть дату видачі"
+                type="date"
+                required
+              ></v-text-field>
               <div class="input-box button">
-                <button type="submit" @click="redirectToTemplateChoose">
-                  Додати
-                </button>
+                <button type="submit">Додати</button>
               </div>
-            </form>
+            </v-form>
           </div>
         </div>
       </div>
     </div>
+    <v-snackbar
+      v-model="showSnackbar"
+      :timeout="snackbarTimeout"
+      top
+      color="red"
+    >
+      {{ snackbarMessage }}
+      <template v-slot:action="{ attrs }">
+        <v-btn color="white" text v-bind="attrs" @click="showSnackbar = false">
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
 
 <script>
 import Network from "@/Network";
+import AddStudent from "./AddStudent.vue";
+import {
+  titleRules,
+  durationRules,
+  teacherSurnameRules,
+  dateOfGivingRules,
+} from "@/utils/certificateFormRules";
+
 export default {
+  components: {
+    AddStudent,
+  },
   data() {
     return {
       headers: [
@@ -95,6 +103,14 @@ export default {
         dateOfGiving: "",
       },
       selectedStudents: [],
+      errorMessage: "",
+      showSnackbar: false,
+      snackbarMessage: "",
+      snackbarTimeout: 3000,
+      titleRules,
+      durationRules,
+      teacherSurnameRules,
+      dateOfGivingRules,
     };
   },
   async mounted() {
@@ -117,14 +133,25 @@ export default {
       }
     },
     async submitCertForm() {
-      console.log("Form submitted with data:", this.data);
-      console.log(this.selectedStudents);
-      if (localStorage) {
-        localStorage.setItem("CertData", JSON.stringify(this.data));
-        localStorage.setItem(
-          "selectedStudents",
-          JSON.stringify(this.selectedStudents)
-        );
+      const form = this.$refs.certForm;
+      if (form && form.validate() && this.selectedStudents.length > 0) {
+        console.log("Form submitted with data:", this.data);
+        console.log(this.selectedStudents);
+        if (localStorage) {
+          localStorage.setItem("CertData", JSON.stringify(this.data));
+          localStorage.setItem(
+            "selectedStudents",
+            JSON.stringify(this.selectedStudents)
+          );
+        }
+        this.redirectToTemplateChoose();
+      } else {
+        this.errorMessage =
+          "Форма не повинна відправлятись пустою, і повинен бути хоча б один обраний студент";
+        this.snackbarMessage =
+          "Форма не повинна відправлятись пустою, і повинен бути хоча б один обраний студент";
+        this.showSnackbar = true;
+        console.log("Form is not valid or no students selected");
       }
     },
     redirectToTemplateChoose() {
@@ -134,4 +161,33 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+:deep(
+    .v-input--density-default
+      .v-field--variant-solo
+      .v-label.v-field-label--floating
+  ),
+:deep(
+    .v-input--density-default
+      .v-field--variant-solo-inverted
+      .v-label.v-field-label--floating
+  ),
+:deep(
+    .v-input--density-default
+      .v-field--variant-filled
+      .v-label.v-field-label--floating
+  ),
+:deep(
+    .v-input--density-default
+      .v-field--variant-solo-filled
+      .v-label.v-field-label--floating
+  ) {
+  top: -2px !important;
+}
+
+.v-selection-control-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: center !important;
+}
+</style>

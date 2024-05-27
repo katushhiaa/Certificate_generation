@@ -7,8 +7,8 @@
           <div class="input-box">
             <input
               type="text"
-              v-model="name"
-              placeholder="Введіть свій логін"
+              v-model="email"
+              placeholder="Введіть свою електронну пошту"
               required
             />
           </div>
@@ -21,35 +21,33 @@
               required
             />
           </div>
-
-          <div class="role-selection">
-            <input
-              type="radio"
-              id="teacher"
-              v-model="role"
-              value="teacher"
-              class="form-radio"
-            />
-            <label for="teacher"> Я викладач</label>
-
-            <input
-              type="radio"
-              id="student"
-              v-model="role"
-              value="student"
-              class="text"
-            />
-            <label for="student">Я студент</label>
-          </div>
         </div>
 
         <div class="input-box button">
           <button type="submit">Увійти</button>
         </div>
+        <v-snackbar
+          v-model="showSnackbar"
+          :timeout="snackbarTimeout"
+          top
+          color="red"
+        >
+          {{ snackbarMessage }}
+          <template v-slot:action="{ attrs }">
+            <v-btn
+              color="white"
+              text
+              v-bind="attrs"
+              @click="showSnackbar = false"
+            >
+              Close
+            </v-btn>
+          </template>
+        </v-snackbar>
         <div class="text">
           <h3>
-            Не маєте акаунт?<a href="#" @click="redirectToSignUp"
-              >Зареєструватись</a
+            Не маєте акаунт?<router-link to="/signup"
+              >Зареєструватись</router-link
             >
           </h3>
         </div>
@@ -64,34 +62,42 @@ export default {
   name: "loginComp",
   data() {
     return {
-      name: "",
+      email: "",
       password: "",
-      role: "",
+      errorMessage: "",
+      showSnackbar: false,
+      snackbarMessage: "",
+      snackbarTimeout: 6000,
     };
   },
   methods: {
     async submitLogin() {
-      if (this.role === "teacher") {
-        this.$router.push("/teacher");
-      } else if (this.role === "student") {
-        this.$router.push("/student");
-      }
-
+      this.errorMessage = "";
+      this.showSnackbar = false;
       try {
         const response = await Network.login({
-          name: this.name,
+          email: this.email,
           password: this.password,
-          role: this.role,
         });
         const userId = response.data.userId;
+        const role = response.data.role;
+        console.log(role);
         localStorage.setItem("userId", userId);
+        if (role === "teacher") {
+          this.$router.push("/teacher");
+        } else if (role === "student") {
+          this.$router.push("/student");
+        }
+
         console.log(response.data);
       } catch (error) {
-        console.log(error);
+        if (error.response && error.response.status === 400) {
+          this.snackbarMessage = error.response.data.message;
+        } else {
+          this.snackbarMessage = "An error occurred. Please try again.";
+        }
+        this.showSnackbar = true;
       }
-    },
-    redirectToSignUp() {
-      this.$router.push("/signup");
     },
   },
 };

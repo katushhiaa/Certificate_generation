@@ -42,8 +42,8 @@ class Network {
     return axios.post(`${this.baseUrl}/generateCertificate`, data);
   }
 
-  async getTemplates() {
-    return axios.get(`${this.baseUrl}/templates`);
+  async getTemplates(params) {
+    return axios.get(`${this.baseUrl}/templates`, { params });
   }
 
   async getCertificateImageData(params) {
