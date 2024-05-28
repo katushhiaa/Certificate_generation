@@ -6,9 +6,9 @@
       @submit.prevent="saveTemplate"
     >
       <div class="certificate-container">
-        <div class="input-box" style="top: 280px">
+        <div class="button-box" style="top: 280px">
           <div>
-            <label for="file-upload" class="input-box button">
+            <label for="file-upload" class="button-box button">
               <v-file-input outlined label="File" v-model="image" />
             </label>
           </div>
@@ -27,7 +27,7 @@
             style="width: 220px; height: 300px"
           />
 
-          <div class="save-button">
+          <div v-if="isDesctop" class="save-button">
             <button type="submit">Зберегти</button>
           </div>
         </div>
@@ -52,6 +52,9 @@
             </div>
           </div>
         </div>
+        <div v-if="!isDesctop" class="save-button">
+          <button type="submit">Зберегти</button>
+        </div>
       </div>
     </form>
   </div>
@@ -68,25 +71,28 @@ export default {
     return {
       image: null,
       base64: null,
-      words: [
+      wordsLarge: [
         { text: "Student", top: 0, left: -230, color: "#000000", font: 18 },
-        {
-          text: "Event",
-          top: 24,
-          left: -230,
-          color: "#000000",
-          font: 24,
-        },
+        { text: "Event", top: 24, left: -230, color: "#000000", font: 24 },
         { text: "Teacher", top: 60, left: -230, color: "#000000", font: 18 },
         { text: "Duration", top: 90, left: -230, color: "#000000", font: 18 },
         { text: "Date", top: 120, left: -230, color: "#000000", font: 18 },
       ],
+      wordsSmall: [
+        { text: "Student", top: -50, left: 10, color: "#000000", font: 18 },
+        { text: "Event", top: -55, left: 95, color: "#000000", font: 24 },
+        { text: "Teacher", top: -50, left: 170, color: "#000000", font: 18 },
+        { text: "Duration", top: -50, left: 255, color: "#000000", font: 18 },
+        { text: "Date", top: -50, left: 345, color: "#000000", font: 18 },
+      ],
+      words: [],
       color: "#000000",
       colorPickerVisible: false,
       dragging: false,
       currentWordIndex: -1,
       offsetX: 0,
       offsetY: 0,
+      isDesctop: false,
     };
   },
   components: {
@@ -100,6 +106,13 @@ export default {
         this.base64 = null;
       }
     },
+  },
+  mounted() {
+    window.addEventListener("resize", this.handleResize);
+    this.handleResize();
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.handleResize);
   },
   methods: {
     startDrag(index, event) {
@@ -169,12 +182,22 @@ export default {
       });
 
       console.log(response.data);
-      alert("Saved sucssesfully");
+      alert("Saved successfully");
       this.$router.push("/certificate");
+    },
+    handleResize() {
+      if (window.innerWidth < window.innerHeight) {
+        this.words = this.wordsSmall;
+        this.isDesctop = false;
+      } else {
+        this.words = this.wordsLarge;
+        this.isDesctop = true;
+      }
     },
   },
 };
 </script>
+
 <style scoped>
 .page-container {
   margin: 60px auto;
@@ -221,7 +244,7 @@ export default {
   background: #cccccc54;
 }
 
-.input-box {
+.button-box {
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -257,5 +280,44 @@ export default {
   border-radius: 5px;
   font-size: 16px;
   transition: background-color 0.3s ease;
+}
+
+@media (max-width: 767px) {
+  .page-container {
+    margin: 0;
+    width: 100vw;
+  }
+
+  .certificate-container {
+    justify-content: flex-start;
+    flex-direction: column;
+  }
+
+  .button-box {
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .default-word-position {
+    width: 100vw;
+    height: 60px;
+  }
+
+  .template-container {
+    width: 100vw;
+    height: 50vw;
+  }
+
+  .template-container img {
+    width: 100vw;
+    height: 50vw;
+  }
+
+  .save-button {
+    width: 70vw;
+    text-align: center;
+    margin: 50px auto 0;
+  }
 }
 </style>

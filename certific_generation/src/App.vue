@@ -238,5 +238,22 @@ label {
     flex-direction: column;
     padding-top: 90px;
   }
+
+  .button-box {
+    background-color: #7092aa;
+  }
+
+  .button-container button {
+    margin: 5px 0;
+  }
+  .default-word-position {
+    background-color: #fff;
+  }
+  .template-container {
+    position: relative;
+    user-select: none;
+    width: 900px;
+    height: 400px;
+  }
 }
 </style>
