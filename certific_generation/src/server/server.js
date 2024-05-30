@@ -43,6 +43,7 @@ const certificateSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "certificate_templates",
   },
+  certNumber: { type: String, unique: true },
 });
 
 const templateSchema = new mongoose.Schema({
@@ -259,6 +260,9 @@ app.post("/generateCertificate", async (req, res) => {
       const sertificates = [];
       selectedStudents.forEach((student) => {
         console.log(`Creating the sertificate for ${student.name}`);
+        const certNumber = `CERT-${Date.now()}-${Math.floor(
+          Math.random() * 1000
+        )}`;
 
         const html = `
       <!DOCTYPE html>
@@ -351,6 +355,7 @@ app.post("/generateCertificate", async (req, res) => {
             studentId: student.id,
             templateId: template.id,
             image: base64Image,
+            certNumber: certNumber,
             // title: CertData.title,
             // duration: CertData.duration,
             // teacherSurname: CertData.teacherSurname,

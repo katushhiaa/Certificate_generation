@@ -9,11 +9,20 @@
         <div class="button-box" style="top: 280px">
           <div>
             <label for="file-upload" class="button-box button">
-              <v-file-input outlined label="File" v-model="image" />
+              <v-file-input
+                outlined
+                label="File"
+                v-model="image"
+                variant="solo-inverted"
+              />
             </label>
           </div>
 
-          <button @click="pickColorForAllWords" class="custom-button">
+          <button
+            type="button"
+            @click="pickColorForAllWords"
+            class="custom-button"
+          >
             Вибрати колір слів
           </button>
 
@@ -26,7 +35,6 @@
             @inputBlur="inputBlur"
             style="width: 220px; height: 300px"
           />
-
           <div v-if="isDesctop" class="save-button">
             <button type="submit">Зберегти</button>
           </div>
@@ -47,6 +55,7 @@
                 'font-size': word.font + 'px',
               }"
               @mousedown="startDrag(index, $event)"
+              @touchstart="startDrag(index, $event)"
             >
               {{ word.text }}
             </div>
@@ -64,7 +73,6 @@
 import { ColorPicker } from "vue-color-kit";
 import "vue-color-kit/dist/vue-color-kit.css";
 import Network from "@/Network";
-import axios from "axios";
 
 export default {
   data() {
@@ -118,10 +126,19 @@ export default {
     startDrag(index, event) {
       this.dragging = true;
       this.currentWordIndex = index;
-      this.offsetX = event.clientX - this.words[index].left;
-      this.offsetY = event.clientY - this.words[index].top;
-      document.addEventListener("mousemove", this.drag);
-      document.addEventListener("mouseup", this.endDrag);
+
+      if (event.type === "mousedown") {
+        this.offsetX = event.clientX - this.words[index].left;
+        this.offsetY = event.clientY - this.words[index].top;
+        document.addEventListener("mousemove", this.drag);
+        document.addEventListener("mouseup", this.endDrag);
+      } else if (event.type === "touchstart") {
+        const touch = event.touches[0];
+        this.offsetX = touch.clientX - this.words[index].left;
+        this.offsetY = touch.clientY - this.words[index].top;
+        document.addEventListener("touchmove", this.drag);
+        document.addEventListener("touchend", this.endDrag);
+      }
     },
     createBase64Image: function (FileObject) {
       const reader = new FileReader();
@@ -132,14 +149,25 @@ export default {
     },
     drag(event) {
       if (this.dragging) {
-        this.words[this.currentWordIndex].top = event.clientY - this.offsetY;
-        this.words[this.currentWordIndex].left = event.clientX - this.offsetX;
+        if (event.type === "mousemove") {
+          this.words[this.currentWordIndex].top = event.clientY - this.offsetY;
+          this.words[this.currentWordIndex].left = event.clientX - this.offsetX;
+        } else if (event.type === "touchmove") {
+          const touch = event.touches[0];
+          this.words[this.currentWordIndex].top = touch.clientY - this.offsetY;
+          this.words[this.currentWordIndex].left = touch.clientX - this.offsetX;
+        }
       }
     },
-    endDrag() {
+    endDrag(event) {
       this.dragging = false;
-      document.removeEventListener("mousemove", this.drag);
-      document.removeEventListener("mouseup", this.endDrag);
+      if (event.type === "mouseup") {
+        document.removeEventListener("mousemove", this.drag);
+        document.removeEventListener("mouseup", this.endDrag);
+      } else if (event.type === "touchend") {
+        document.removeEventListener("touchmove", this.drag);
+        document.removeEventListener("touchend", this.endDrag);
+      }
     },
     pickColorForAllWords() {
       this.colorPickerVisible = !this.colorPickerVisible;
@@ -263,6 +291,7 @@ export default {
   border-radius: 5px;
   font-size: 16px;
   transition: background-color 0.3s ease;
+  cursor: pointer;
 }
 
 .draggable {
@@ -280,6 +309,12 @@ export default {
   border-radius: 5px;
   font-size: 16px;
   transition: background-color 0.3s ease;
+}
+
+.v-field.v-field--appended {
+  --v-field-padding-end: 6px;
+  background-color: antiquewhite;
+  width: 180px;
 }
 
 @media (max-width: 767px) {
@@ -318,6 +353,12 @@ export default {
     width: 70vw;
     text-align: center;
     margin: 50px auto 0;
+  }
+
+  .v-field.v-field--appended {
+    --v-field-padding-end: 6px;
+    background-color: antiquewhite;
+    width: 180px;
   }
 }
 </style>
