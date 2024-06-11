@@ -25,7 +25,7 @@
         <v-text-field
           v-model="confirmPassword"
           :rules="confirmPasswordRules"
-          label="Підвердіть пароль"
+          label="Підтвердіть пароль"
           type="password"
           required
         ></v-text-field>
@@ -37,7 +37,7 @@
             value="teacher"
             class="form-radio"
           />
-          <label for="teacher"> Я викладач</label>
+          <label for="teacher">Я викладач</label>
 
           <input
             type="radio"
@@ -47,7 +47,7 @@
             class="form-radio"
           />
           <label for="student">Я студент</label>
-          <div v-if="!roleValid" class="error-message">Role is required</div>
+          <div v-if="!roleValid" class="error-message">Роль є обов'язковою</div>
         </div>
         <div class="input-box button">
           <button type="submit">Зареєструватись</button>
@@ -66,7 +66,7 @@
               v-bind="attrs"
               @click="showSnackbar = false"
             >
-              Close
+              Закрити
             </v-btn>
           </template>
         </v-snackbar>
@@ -129,20 +129,26 @@ export default {
           password: this.password,
           role: this.role,
         });
-        console.log(response.data);
-        this.snackbarMessage = "User registered successfully";
+        const userId = response.data.userId;
+        const role = response.data.role;
+        const name = this.name;
+        localStorage.setItem("userId", userId);
+        localStorage.setItem("role", role);
+        localStorage.setItem("name", name);
+        this.snackbarMessage = "Користувач успішно зареєстрований";
         this.showSnackbar = true;
-        if (this.role === "teacher") {
+        if (role === "teacher") {
           this.$router.push("/teacher");
-        } else if (this.role === "student") {
+        } else if (role === "student") {
           this.$router.push("/student");
         }
       } catch (error) {
-        console.error("Error during signup:", error.response.data);
+        console.error("Помилка під час реєстрації:", error.response.data);
         if (error.response && error.response.status === 400) {
           this.snackbarMessage = error.response.data.message;
         } else {
-          this.snackbarMessage = "An error occurred. Please try again.";
+          this.snackbarMessage =
+            "Сталася помилка. Будь ласка, спробуйте ще раз.";
         }
         this.showSnackbar = true;
       }

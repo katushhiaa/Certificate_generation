@@ -40,15 +40,14 @@
               v-bind="attrs"
               @click="showSnackbar = false"
             >
-              Close
+              Закрити
             </v-btn>
           </template>
         </v-snackbar>
         <div class="text">
           <h3>
-            Не маєте акаунт?<router-link to="/signup"
-              >Зареєструватись</router-link
-            >
+            Не маєте акаунт?
+            <router-link to="/signup">Зареєструватись</router-link>
           </h3>
         </div>
       </form>
@@ -81,20 +80,25 @@ export default {
         });
         const userId = response.data.userId;
         const role = response.data.role;
-        console.log(role);
+        const name = response.data.name;
+        const accessToken = response.data.accessToken;
+
         localStorage.setItem("userId", userId);
+        localStorage.setItem("role", role);
+        localStorage.setItem("name", name);
+        localStorage.setItem("user", JSON.stringify({ accessToken }));
+
         if (role === "teacher") {
           this.$router.push("/teacher");
         } else if (role === "student") {
           this.$router.push("/student");
         }
-
-        console.log(response.data);
       } catch (error) {
         if (error.response && error.response.status === 400) {
           this.snackbarMessage = error.response.data.message;
         } else {
-          this.snackbarMessage = "An error occurred. Please try again.";
+          this.snackbarMessage =
+            "Сталася помилка. Будь ласка, спробуйте ще раз.";
         }
         this.showSnackbar = true;
       }

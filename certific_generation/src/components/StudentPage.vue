@@ -1,50 +1,103 @@
 <template>
-  <ul class="certificates">
-    <li
-      v-for="(certificate, idx) in certificates"
-      :key="idx"
-      @click="downloadPdf(certificate)"
-    >
-      <img :src="'data:image/png;base64,' + certificate" alt="Certificate" />
-    </li>
-  </ul>
+  <div class="carousel">
+    <Carousel @slide-start="handleSlideStart" @init="handleInit">
+      <Slide v-for="(certificate, idx) in certificates" :key="idx">
+        <div class="carousel__item">
+          <img
+            :src="'data:image/png;base64,' + certificate"
+            alt="Certificate"
+          />
+        </div>
+      </Slide>
+      <template #addons>
+        <Navigation />
+        <Pagination />
+      </template>
+    </Carousel>
+    <div class="input-box button">
+      <button
+        @click="printCertificate"
+        style="width: 250px; height: 50px; margin: 10px"
+      >
+        Друкувати
+      </button>
+      <button
+        @click="downloadPDF"
+        style="width: 250px; height: 50px; margin: 10px"
+      >
+        Завантажити в ПДФ
+      </button>
+    </div>
+  </div>
 </template>
 
 <script>
 import Network from "@/Network";
+import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";
+import "vue3-carousel/dist/carousel.css";
 
 export default {
   name: "StudentComp",
+  components: {
+    Carousel,
+    Slide,
+    Pagination,
+    Navigation,
+  },
   data() {
     return {
       certificates: [],
+      currentCertificate: null,
     };
   },
   created() {
     this.fetchCertificates();
   },
   methods: {
+    handleInit() {
+      if (this.certificates.length) {
+        this.selectCert(this.certificates[0]);
+      }
+    },
+    handleSlideStart(data) {
+      this.selectCert(this.certificates[data.slidingToIndex]);
+    },
+    async selectCert(certificate) {
+      try {
+        this.currentCertificate = certificate;
+        console.log("Selected certificate:", certificate);
+      } catch (error) {
+        console.error("Error selecting certificate:", error);
+      }
+    },
     async fetchCertificates() {
       try {
         const userId = localStorage.getItem("userId");
-
         const response = await Network.getStudentCertificates({ userId });
         this.certificates = response.data.map(({ image }) => image);
+        if (this.certificates.length > 0) {
+          this.currentCertificate = this.certificates[0];
+        }
       } catch (error) {
         console.error("Error fetching certificates:", error);
       }
     },
-    async downloadPdf(image) {
+    async downloadPDF() {
       try {
+        if (!this.currentCertificate) {
+          console.error("No certificate selected");
+          return;
+        }
+
         const response = await Network.generatePDF(
-          { studentCertificates: [image] },
+          { studentCertificates: [this.currentCertificate] },
           { responseType: "blob" }
         );
         const blob = new Blob([response.data], { type: "application/pdf" });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", "studentCertificates.pdf");
+        link.setAttribute("download", "certificate.pdf");
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -53,23 +106,39 @@ export default {
         console.error("Error downloading PDF:", error);
       }
     },
+    printCertificate() {
+      if (!this.currentCertificate) {
+        console.error("No certificate selected");
+        return;
+      }
+      /*const printWindow = window.open("", "_blank");
+      printWindow.document.write(
+        "<html><head><title>Print Certificates</title></head><body>"
+      );*/
+
+      window.print(
+        `<img src="data:image/png;base64,${this.currentCertificate}" style="width: 100%; page-break-after: always;" />`
+      );
+      /*printWindow.document.write("</body></html>");
+      printWindow.document.close();
+      printWindow.print();*/
+    },
   },
 };
 </script>
 
 <style>
-.certificates {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  margin: 60px 0;
+.carousel__item {
+  position: relative;
   text-align: center;
-  gap: 10px;
 }
 
-.certificates li {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.buttons {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
 }
 </style>

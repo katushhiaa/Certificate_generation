@@ -26,19 +26,39 @@
           :disabled="isLoading"
           class="generate-button"
         >
-          <span v-if="!isLoading">Згенерувати сертифікат</span>
+          <span v-if="!isLoading"
+            >Згенерувати сертифікат ({{ selectedStudentsCount }})</span
+          >
           <span v-if="isLoading">Зачекайте...</span>
         </button>
         <button
           @click="createNewCertificate"
           style="width: 250px; height: 50px; margin: 10px"
         >
-          Додати Сертифікат
+          Створити шаблон
+        </button>
+        <button
+          v-if="isGenerated"
+          @click="printCertificates"
+          style="width: 250px; height: 50px; margin: 10px"
+        >
+          Друкувати
+        </button>
+        <button
+          v-if="isGenerated"
+          @click="downloadPDF"
+          style="width: 250px; height: 50px; margin: 10px"
+        >
+          Завантажити в ПДФ
         </button>
       </div>
-      <ul class="generated-sertificats">
+      <ul class="generated-sertificats" style="width: 100vw; padding: 0">
         <li v-for="(image, idx) in generatedSerts" :key="idx">
-          <img :src="'data:image/png;base64,' + image" alt="Template" />
+          <img
+            :src="'data:image/png;base64,' + image"
+            alt="Template"
+            style="width: 100vw"
+          />
         </li>
       </ul>
     </div>
@@ -74,13 +94,43 @@ export default defineComponent({
       htmlTemplate: "",
       generatedSerts: [],
       selectedTempate: "",
+      selectedStudentsCount: 0,
       isLoading: false,
+      isGenerated: false,
     };
   },
   created() {
     this.fetchTemplates();
+    this.computeSelectedStudentsCount();
   },
   methods: {
+    async computeSelectedStudentsCount() {
+      const selectedStudents = JSON.parse(
+        localStorage.getItem("selectedStudents")
+      );
+      this.selectedStudentsCount = selectedStudents
+        ? selectedStudents.length
+        : 0;
+    },
+    async downloadPDF() {
+      try {
+        const response = await Network.generatePDF(
+          { studentCertificates: this.generatedSerts },
+          { responseType: "blob" }
+        );
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "certificates.pdf");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error("Error downloading PDF:", error);
+      }
+    },
     handleInit() {
       if (this.templates.length) {
         this.selectTemplate(this.templates[0]);
@@ -110,6 +160,20 @@ export default defineComponent({
         console.error("Error selecting template:", error);
       }
     },
+    printCertificates() {
+      const printWindow = window.open("", "_blank");
+      printWindow.document.write(
+        "<html><head><title>Print Certificates</title></head><body>"
+      );
+      this.generatedSerts.forEach((image) => {
+        printWindow.document.write(
+          `<img src="data:image/png;base64,${image}" style="width: 100%; page-break-after: always;" />`
+        );
+      });
+      printWindow.document.write("</body></html>");
+      printWindow.document.close();
+      printWindow.print();
+    },
     async generateCertificate() {
       const selectedStudents = JSON.parse(
         localStorage.getItem("selectedStudents")
@@ -127,6 +191,7 @@ export default defineComponent({
 
         this.generatedSerts = response.data;
         this.isLoading = false;
+        this.isGenerated = true;
       } catch (error) {
         console.error(error);
       }
@@ -178,6 +243,7 @@ export default defineComponent({
   margin: 0;
   padding: 0;
   list-style: none;
+  width: 100vw;
 }
 
 .input-box.button button.generate-button:disabled {

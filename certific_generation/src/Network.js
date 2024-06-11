@@ -1,4 +1,8 @@
 import axios from "axios";
+import authHeader from "./auth-header";
+import router from "./router.js";
+
+const ERR_BAD_REQUEST = "ERR_BAD_REQUEST";
 
 class Network {
   constructor() {
@@ -15,45 +19,62 @@ class Network {
   }
 
   getAllStudents() {
-    return axios.get(`${this.baseUrl}/students`);
+    //return axios.get(`${this.baseUrl}/students`, { headers: authHeader() });
+    return this.authGet(`${this.baseUrl}/students`);
   }
 
   certificateDate(data) {
-    return axios.post(`${this.baseUrl}/certificateData`, data);
+    return axios.post(`${this.baseUrl}/certificateData`, data, {
+      headers: authHeader(),
+    });
   }
 
   getCertData() {
-    return axios.get(`${this.baseUrl}/getCertData`);
+    //return axios.get(`${this.baseUrl}/getCertData`, { headers: authHeader() });
+    return this.authGet(`${this.baseUrl}/getCertData`);
   }
 
   saveTemplateData(data) {
-    return axios.post(`${this.baseUrl}/saveTemplateData`, data);
+    return axios.post(`${this.baseUrl}/saveTemplateData`, data, {
+      headers: authHeader(),
+    });
   }
 
   uploadFile(formData) {
     return axios.post(`${this.baseUrl}/upload`, formData, {
       headers: {
+        ...authHeader(),
         "Content-Type": "multipart/form-data",
       },
     });
   }
 
   async generateCertificate(data) {
-    return axios.post(`${this.baseUrl}/generateCertificate`, data);
+    return axios.post(`${this.baseUrl}/generateCertificate`, data, {
+      headers: authHeader(),
+    });
   }
 
   async getTemplates(params) {
-    return axios.get(`${this.baseUrl}/templates`, { params });
+    return this.authGet(`${this.baseUrl}/templates`, {
+      params,
+    });
   }
 
   async getCertificateImageData(params) {
-    return await axios.get(`${this.baseUrl}/getCertificateImageData`, {
+    return this.authGet(`${this.baseUrl}/getCertificateImageData`, {
       params,
     });
   }
 
   async getStudentCertificates(params) {
-    return axios.get(`${this.baseUrl}/getStudentCertificates`, { params });
+    // return axios.get(`${this.baseUrl}/getStudentCertificates`, {
+    //   params,
+    //   headers: authHeader(),
+    // });
+    return this.authGet(`${this.baseUrl}/getStudentCertificates`, {
+      params,
+    });
   }
 
   async generatePDF(data, config) {
@@ -67,29 +88,20 @@ class Network {
   get path() {
     return this.baseUrl;
   }
-  /*getAll() {
-    return axios.get(`${this.baseUrl}/signup`);
-  }
 
-  get(id) {
-    return axios.get(`${this.baseUrl}/signup/${id}`);
+  authGet(url, data) {
+    return axios
+      .get(url, {
+        ...data,
+        headers: authHeader(),
+      })
+      .catch((error) => {
+        if (error.code === ERR_BAD_REQUEST) {
+          router.push("/login");
+        }
+        console.log(error);
+      });
   }
-
-  create(data) {
-    return axios.post(`${this.baseUrl}/signup`, data);
-  }
-
-  update(id, data) {
-    return axios.put(`${this.baseUrl}/signup/${id}`, data);
-  }
-
-  delete(id) {
-    return axios.delete(`${this.baseUrl}/signup/${id}`);
-  }
-
-  deleteAll() {
-    return axios.delete(`${this.baseUrl}/signup`);
-  }*/
 }
 
 export default new Network();

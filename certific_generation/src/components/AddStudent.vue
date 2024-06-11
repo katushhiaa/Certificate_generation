@@ -3,7 +3,7 @@
     <div class="input-box button" style="margin: 10px; height: 50px">
       <button @click="modalShow = !modalShow">Додати студента</button>
     </div>
-    <b-modal v-model="modalShow">
+    <b-modal v-model="modalShow" hide-footer>
       <form @submit.prevent="submitForm">
         <v-text-field
           v-model="name"
@@ -24,7 +24,10 @@
           type="password"
           required
         ></v-text-field>
-        <v-btn type="submit">Зареєструвати</v-btn>
+        <div class="modal-footer">
+          <v-btn type="submit" color="primary">Зареєструвати студента</v-btn>
+          <v-btn @click="modalShow = false" color="secondary">Cancel</v-btn>
+        </div>
       </form>
     </b-modal>
   </div>
@@ -95,5 +98,11 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: center !important;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
 }
 </style>
