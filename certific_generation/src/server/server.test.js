@@ -220,7 +220,7 @@ describe("API Endpoints", () => {
           dateOfGiving_color: "orange",
           dateOfGiving_top: 300,
           dateOfGiving_left: 130,
-          image: "data:image/png;base64,...",
+          image: "./image.png",
           imageWidth: 800,
           imageHeight: 600,
           createdBy: userId,
@@ -250,6 +250,6 @@ describe("API Endpoints", () => {
 
       expect(res.statusCode).toEqual(200);
       expect(Array.isArray(res.body)).toBeTruthy();
-    }, 200000);
+    }, 10000);
   });
 });

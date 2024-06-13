@@ -102,6 +102,8 @@ export default {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
+
+        this.$nextTick(() => {});
       } catch (error) {
         console.error("Error downloading PDF:", error);
       }
@@ -111,17 +113,20 @@ export default {
         console.error("No certificate selected");
         return;
       }
-      /*const printWindow = window.open("", "_blank");
+
+      const printWindow = window.open("", "_blank");
       printWindow.document.write(
         "<html><head><title>Print Certificates</title></head><body>"
-      );*/
+      );
 
-      window.print(
+      printWindow.document.write(
         `<img src="data:image/png;base64,${this.currentCertificate}" style="width: 100%; page-break-after: always;" />`
       );
-      /*printWindow.document.write("</body></html>");
+      printWindow.document.write("</body></html>");
       printWindow.document.close();
-      printWindow.print();*/
+      printWindow.print();
+
+      this.$nextTick(() => {});
     },
   },
 };

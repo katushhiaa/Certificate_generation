@@ -20,7 +20,6 @@ export default {
 </script>
 
 <style>
-/* General styles */
 @import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap");
 * {
   margin: 0;
@@ -165,12 +164,6 @@ label {
   flex-direction: column;
   margin: 0 auto;
 }
-
-/*.main-container {
-  width: 650px;
-  margin: 0 auto;
-}*/
-
 :deep(
     .v-input--density-default
       .v-field--variant-solo

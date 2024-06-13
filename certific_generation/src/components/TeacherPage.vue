@@ -14,6 +14,8 @@
                 select-all
                 show-select
                 :pagination="true"
+                @input="updateSelectedStudents"
+                class="custom-data-table"
               ></v-data-table>
               <AddStudent></AddStudent>
             </div>
@@ -69,6 +71,13 @@
         </v-btn>
       </template>
     </v-snackbar>
+    <button
+      @click="redirectToTemplateChoose"
+      :disabled="!isCertDataSaved"
+      class="next-button"
+    >
+      Далі &rarr;
+    </button>
   </div>
 </template>
 
@@ -111,10 +120,13 @@ export default {
       durationRules,
       teacherSurnameRules,
       dateOfGivingRules,
+
+      isCertDataSaved: false,
     };
   },
   async mounted() {
     await this.fetchStudents();
+    this.checkCertDataInLocalStorage();
   },
   methods: {
     async fetchStudents() {
@@ -132,6 +144,23 @@ export default {
         this.isBusy = false;
       }
     },
+    checkCertDataInLocalStorage() {
+      const certData = localStorage.getItem("CertData");
+      const selectedStudents = localStorage.getItem("selectedStudents");
+      if (certData) {
+        this.data = JSON.parse(certData);
+        this.selectedStudents = JSON.parse(selectedStudents);
+        this.isCertDataSaved = true;
+      }
+    },
+    updateSelectedStudents() {
+      if (localStorage) {
+        localStorage.setItem(
+          "selectedStudents",
+          JSON.stringify(this.selectedStudents)
+        );
+      }
+    },
     async submitCertForm() {
       const form = this.$refs.certForm;
       if (form && form.validate() && this.selectedStudents.length > 0) {
@@ -144,6 +173,7 @@ export default {
             JSON.stringify(this.selectedStudents)
           );
         }
+        this.isCertDataSaved = true;
         this.redirectToTemplateChoose();
       } else {
         this.errorMessage =
@@ -189,5 +219,23 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: center !important;
+}
+
+.next-button {
+  position: absolute;
+  top: 70px;
+  right: 10px;
+  padding: 10px 20px;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+}
+
+@media (max-width: 767px) {
+  .next-button {
+    top: 50px;
+  }
 }
 </style>

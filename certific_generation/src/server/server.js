@@ -4,7 +4,6 @@ dotenv.config({ path: path.resolve("../../.env") });
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-import multer from "multer";
 import path from "path";
 import fs from "fs";
 import nodeHtmlToImage from "node-html-to-image";
@@ -19,7 +18,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb" }));
 
 const config = {
-  secret: process.env.SECRET || "default_secret", // Provide a default value for testing
+  secret: process.env.SECRET || "default_secret",
 };
 
 const dbUri =
@@ -28,8 +27,6 @@ const dbUri =
     : "mongodb+srv://kanurevamail:0x02G24YUd6AFGbe@dimplom-cluster.yc8oa4y.mongodb.net/?retryWrites=true&w=majority&appName=Dimplom-cluster/database";
 
 mongoose.connect(dbUri);
-
-// mongoose.connect("mongodb://localhost:27017/database");
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
@@ -141,39 +138,6 @@ const User = mongoose.model("users", userSchema);
 const Certificate = mongoose.model("certificates", certificateSchema);
 const Template = mongoose.model("certificate_templates", templateSchema);
 
-const fileStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./images");
-  },
-  filename: (req, file, cb) => {
-    console.log(file);
-    cb(null, Date.now() + "--" + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({ storage: fileStorage });
-
-/*app.post("/upload", upload.single("image"), (req, res) => {
-  console.log(req.file);
-  res.json({
-    imagePath: req.file.path,
-  });
-});
-
-const imagesFolderPath = path.resolve("images");
-app.use("/images", express.static(imagesFolderPath));
-
-/*app.get("/images", (req, res) => {
-  const directoryPath = imagesFolderPath;
-  fs.readdir(directoryPath, (err, files) => {
-    if (err) {
-      return console.log("Unable to scan directory: " + err);
-    }
-    const imagePaths = files.map((file) => `/images/${file}`);
-    res.json(imagePaths);
-  });
-});*/
-
 app.get("/templates", [checkToken, checkRole("teacher")], async (req, res) => {
   const { userId } = req.query;
   try {
@@ -187,44 +151,10 @@ app.get("/templates", [checkToken, checkRole("teacher")], async (req, res) => {
   }
 });
 
-const sertificatesFolderPath = path.resolve("sertificates");
-app.use("/sertificates", express.static(sertificatesFolderPath));
-
-app.get("/sertificates", (req, res) => {
-  const directoryPath = sertificatesFolderPath;
-  fs.readdir(directoryPath, (err, files) => {
-    if (err) {
-      return console.log("Unable to scan directory: " + err);
-    }
-    const imagePaths = files.map((file) => `/sertificates/${file}`);
-    res.json(imagePaths);
-  });
-});
-
 let students = [];
 let certificates = [];
 
 app.use(express.json());
-
-/*app.post("/signup", async (req, res) => {
-  const { name, email, password, role } = req.body;
-  try {
-    const existingUser = await User.findOne({ email: email });
-    if (existingUser) {
-      return res.status(400).json({ message: "Цей email вже існує" });
-    } else {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = new User({ name, email, password: hashedPassword, role });
-      await newUser.save();
-      return res
-        .status(201)
-        .json({ message: "Користувача успішно зареєстровано" });
-    }
-  } catch (error) {
-    console.error("Помилка під час реєстрації:", error);
-    return res.status(500).json({ message: "Помилка сервера" });
-  }
-});*/
 
 app.post("/signup", async (req, res) => {
   const { name, email, password, role } = req.body;
@@ -236,10 +166,19 @@ app.post("/signup", async (req, res) => {
     } else {
       const hashedPassword = await bcrypt.hash(password, 10);
       const newUser = new User({ name, email, password: hashedPassword, role });
+      const token = jwt.sign({ id: newUser._id }, config.secret, {
+        algorithm: "HS256",
+        allowInsecureKeySizes: true,
+        expiresIn: 86400,
+      });
       await newUser.save();
-      return res
-        .status(201)
-        .json({ message: "Користувача успішно зареєстровано" });
+      return res.status(201).json({
+        message: "Користувача успішно зареєстровано",
+        userId: newUser._id,
+        role: newUser.role,
+        accessToken: token,
+        name: newUser.name,
+      });
     }
   } catch (error) {
     console.error("Error during signup:", error);
@@ -354,20 +293,6 @@ app.post(
   }
 );
 
-// app.get("/getCertificateImageData", async (req, res) => {
-//   try {
-//     const templateId = req.body.templateId;
-//     const template = await Template.findById(templateId);
-//     if (!template) {
-//       return res.status(404).json({ error: "Template not found" });
-//     }
-//     res.status(200).json({ templateId: template._id });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
-
 app.post(
   "/generateCertificate",
   [checkToken, checkRole("teacher")],
@@ -417,13 +342,6 @@ app.post(
             studentName_is_centred: template.studentName_is_centred,
             date_is_centered: template.date_is_centered,
           };
-
-          console.log(adjustedTemplate.studentName_is_centred);
-          // transform: translateX(-50%);
-          // width: 80%;
-          // white-space: pre-wrap;
-          // word-wrap: break-word;
-          // text-align: center;
 
           const center = "transform: translateX(-50%);";
 
@@ -531,7 +449,6 @@ app.post(
             });
             //await newCertificate.save();
             sertificates.push(base64Image);
-            //console.log(html);
             studentsCnt--;
             if (studentsCnt <= 0) {
               res.status(200).json(sertificates);
@@ -563,83 +480,79 @@ app.get(
   }
 );
 
-app.post(
-  "/generatePDF",
-  /*[checkToken /*checkRole(["teacher", "student"])],*/
-  async (req, res) => {
-    try {
-      const studentCertificates = req.body.studentCertificates;
+app.post("/generatePDF", async (req, res) => {
+  try {
+    const studentCertificates = req.body.studentCertificates;
 
-      if (!studentCertificates || studentCertificates.length === 0) {
-        console.error("No certificates provided");
-        return res.status(400).json({ error: "No certificates provided" });
+    if (!studentCertificates || studentCertificates.length === 0) {
+      console.error("No certificates provided");
+      return res.status(400).json({ error: "No certificates provided" });
+    }
+
+    const a4Dimensions = [595, 842];
+    const margin = 0;
+
+    const doc = new PDFDocument({
+      size: a4Dimensions,
+      margin: margin,
+      layout: "landscape",
+    });
+
+    const writeStream = fs.createWriteStream("studentCertificates.pdf");
+    doc.pipe(writeStream);
+
+    studentCertificates.forEach((certificatePath, index) => {
+      const imageBuffer = Buffer.from(certificatePath, "base64");
+
+      if (!imageBuffer) {
+        console.error(`Error converting certificate ${index + 1} to buffer`);
+        return res.status(500).json({
+          error: `Error converting certificate ${index + 1} to buffer`,
+        });
       }
 
-      const a4Dimensions = [595, 842];
-      const margin = 0;
+      const imageDimensions = sizeOf(imageBuffer);
 
-      const doc = new PDFDocument({
-        size: a4Dimensions,
-        margin: margin,
-        layout: "landscape",
+      const pageWidth = a4Dimensions[1];
+      const pageHeight = a4Dimensions[0];
+      const imageAspect = imageDimensions.width / imageDimensions.height;
+      const pageAspect = pageWidth / pageHeight;
+
+      let width, height;
+      if (imageAspect > pageAspect) {
+        width = pageWidth;
+        height = pageWidth / imageAspect;
+      } else {
+        height = pageHeight;
+        width = pageHeight * imageAspect;
+      }
+
+      const x = (pageWidth - width) / 2;
+      const y = (pageHeight - height) / 2;
+
+      doc.image(imageBuffer, x, y, {
+        width: width,
+        height: height,
       });
 
-      const writeStream = fs.createWriteStream("studentCertificates.pdf");
-      doc.pipe(writeStream);
-
-      studentCertificates.forEach((certificatePath, index) => {
-        const imageBuffer = Buffer.from(certificatePath, "base64");
-
-        if (!imageBuffer) {
-          console.error(`Error converting certificate ${index + 1} to buffer`);
-          return res.status(500).json({
-            error: `Error converting certificate ${index + 1} to buffer`,
-          });
-        }
-
-        const imageDimensions = sizeOf(imageBuffer);
-
-        const pageWidth = a4Dimensions[1];
-        const pageHeight = a4Dimensions[0];
-        const imageAspect = imageDimensions.width / imageDimensions.height;
-        const pageAspect = pageWidth / pageHeight;
-
-        let width, height;
-        if (imageAspect > pageAspect) {
-          width = pageWidth;
-          height = pageWidth / imageAspect;
-        } else {
-          height = pageHeight;
-          width = pageHeight * imageAspect;
-        }
-
-        const x = (pageWidth - width) / 2;
-        const y = (pageHeight - height) / 2;
-
-        doc.image(imageBuffer, x, y, {
-          width: width,
-          height: height,
+      if (index !== studentCertificates.length - 1) {
+        doc.addPage({
+          size: a4Dimensions,
+          margin: margin,
+          layout: "landscape",
         });
+      }
+    });
 
-        if (index !== studentCertificates.length - 1) {
-          doc.addPage({
-            size: a4Dimensions,
-            margin: margin,
-            layout: "landscape",
-          });
-        }
-      });
-
-      doc.end();
-      writeStream.on("finish", function () {
-        res.download("studentCertificates.pdf");
-      });
-    } catch (error) {
-      console.error("Server error:", error);
-      res.status(500).json({ error: "Server error" });
-    }
+    doc.end();
+    writeStream.on("finish", function () {
+      res.download("studentCertificates.pdf");
+    });
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).json({ error: "Server error" });
   }
-);
+});
 
 if (process.env.NODE_ENV !== "test") {
   app.listen(3001, () => {

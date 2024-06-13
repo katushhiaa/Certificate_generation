@@ -71,6 +71,14 @@
       </button>
     </div>
     <div id="certificate" v-html="htmlTemplate"></div>
+    <button
+      type="button"
+      @click="goBack"
+      class="back-button"
+      style="color: #ffffff"
+    >
+      ← Назад
+    </button>
   </div>
 </template>
 
@@ -81,7 +89,7 @@ import "vue3-carousel/dist/carousel.css";
 import Network from "@/Network";
 
 export default defineComponent({
-  name: "FinalComp",
+  name: "GenerateCertificate",
   components: {
     Carousel,
     Slide,
@@ -127,6 +135,7 @@ export default defineComponent({
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
+        this.$nextTick(() => {});
       } catch (error) {
         console.error("Error downloading PDF:", error);
       }
@@ -173,6 +182,7 @@ export default defineComponent({
       printWindow.document.write("</body></html>");
       printWindow.document.close();
       printWindow.print();
+      this.$nextTick(() => {});
     },
     async generateCertificate() {
       const selectedStudents = JSON.parse(
@@ -198,6 +208,9 @@ export default defineComponent({
     },
     createNewCertificate() {
       this.$router.push("/createCertificate");
+    },
+    goBack() {
+      this.$router.push("/teacher");
     },
   },
 });
@@ -248,5 +261,22 @@ export default defineComponent({
 
 .input-box.button button.generate-button:disabled {
   background: #555;
+}
+.back-button {
+  position: absolute;
+  top: 70px;
+  left: 10px;
+  padding: 10px 20px;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+}
+
+@media (max-width: 767px) {
+  .back-button {
+    top: 50px;
+  }
 }
 </style>

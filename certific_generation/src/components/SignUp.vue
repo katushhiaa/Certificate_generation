@@ -131,17 +131,21 @@ export default {
         });
         const userId = response.data.userId;
         const role = response.data.role;
+        const accessToken = response.data.accessToken;
         const name = this.name;
+
         localStorage.setItem("userId", userId);
         localStorage.setItem("role", role);
         localStorage.setItem("name", name);
-        this.snackbarMessage = "Користувач успішно зареєстрований";
-        this.showSnackbar = true;
+        localStorage.setItem("user", JSON.stringify({ accessToken }));
+
         if (role === "teacher") {
           this.$router.push("/teacher");
         } else if (role === "student") {
           this.$router.push("/student");
         }
+        this.snackbarMessage = "Користувач успішно зареєстрований";
+        this.showSnackbar = true;
       } catch (error) {
         console.error("Помилка під час реєстрації:", error.response.data);
         if (error.response && error.response.status === 400) {

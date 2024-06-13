@@ -8,18 +8,23 @@
       <div class="certificate-container">
         <div class="button-box" style="top: 280px">
           <div>
+            <div class="center-text" v-if="!image">
+              Оберіть картинку шаблону:
+            </div>
             <label for="file-upload" class="button-box button">
               <v-file-input
                 outlined
                 label="File"
                 v-model="image"
                 variant="solo-inverted"
+                accept="image/png, image/jpg, image/jpeg"
                 class="file-input"
               />
             </label>
           </div>
 
           <button
+            v-if="image"
             type="button"
             @click.prevent="pickColorForAllWords"
             class="custom-button"
@@ -37,13 +42,13 @@
             style="width: 220px; height: 300px"
           />
 
-          <div v-if="isDesctop" class="save-button">
+          <div v-if="isDesctop && image" class="save-button">
             <button type="submit">Зберегти</button>
           </div>
         </div>
 
-        <div class="center-text outer">Центрувати:</div>
-        <div class="checkbox-container">
+        <div class="center-text outer" v-if="image">Центрувати:</div>
+        <div class="checkbox-container" v-if="image">
           <div class="center-text">Центрувати:</div>
           <label class="custom-checkbox">
             <input type="checkbox" v-model="title_is_centred" />
@@ -66,15 +71,15 @@
             <span class="checkbox-label">Дата</span>
           </label>
         </div>
-        <div class="default-word-position"></div>
-        <div class="template-container">
+        <div class="default-word-position" v-if="image"></div>
+        <div class="template-container" v-if="image">
           <img
             v-if="base64"
             :src="base64"
             alt="Template Image"
             ref="templateImage"
           />
-          <div class="movable-words">
+          <div class="movable-words" v-if="image">
             <div
               v-for="(word, index) in words"
               :key="index"
@@ -115,11 +120,11 @@ export default {
       image: null,
       base64: null,
       wordsLarge: [
-        { text: "Студент", top: 0, left: -170, color: "#000000", font: 18 },
-        { text: "Подія", top: 24, left: -170, color: "#000000", font: 24 },
-        { text: "Викладач", top: 60, left: -170, color: "#000000", font: 18 },
-        { text: "Тривалість", top: 90, left: -170, color: "#000000", font: 18 },
-        { text: "Дата", top: 120, left: -170, color: "#000000", font: 18 },
+        { text: "Студент", top: 0, left: -150, color: "#000000", font: 18 },
+        { text: "Подія", top: 24, left: -150, color: "#000000", font: 24 },
+        { text: "Викладач", top: 60, left: -150, color: "#000000", font: 18 },
+        { text: "Тривалість", top: 90, left: -150, color: "#000000", font: 18 },
+        { text: "Дата", top: 120, left: -150, color: "#000000", font: 18 },
       ],
       wordsSmall: [
         { text: "Студент", top: -50, left: 10, color: "#000000", font: 10 },
@@ -252,10 +257,7 @@ export default {
     async saveTemplate() {
       this.getScaledImageWidth();
       const userId = localStorage.getItem("userId");
-      console.log(window.innerWidth);
       const scaleFactor = this.imageWidth / this.widthScaleImage;
-      console.log("coeffff", scaleFactor);
-      console.log(this.imageWidth, window.innerWidth);
 
       const adjustedWords = this.words.map((word) => ({
         ...word,
@@ -263,9 +265,6 @@ export default {
         left: word.left * scaleFactor,
       }));
 
-      console.log("Координати з кольорами всіх полів:", adjustedWords);
-
-      //return;
       const response = await Network.saveTemplateData({
         studentName_color: adjustedWords[0].color,
         studentName_top: adjustedWords[0].top,
@@ -314,7 +313,7 @@ export default {
       });
 
       console.log(response.data);
-      alert("Saved successfully");
+      alert("Успішно збережено");
       this.$router.push("/certificate");
     },
 
@@ -328,7 +327,7 @@ export default {
       }
     },
     goBack() {
-      this.$router.back();
+      this.$router.push("/certificate");
     },
   },
 };

@@ -6,8 +6,8 @@ const ERR_BAD_REQUEST = "ERR_BAD_REQUEST";
 
 class Network {
   constructor() {
-    this.baseUrl = "https://certificate-generation-server.onrender.com";
-    //this.baseUrl = "http://localhost:3001";
+    //this.baseUrl = "https://certificate-generation-server.onrender.com";
+    this.baseUrl = "http://localhost:3001";
   }
 
   signUp(data) {

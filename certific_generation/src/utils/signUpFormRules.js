@@ -1,6 +1,8 @@
 export const nameRules = [
   (v) => !!v || "Ім'я та прізвище обов'язкові",
-  (v) => /^[a-zA-Zа-яА-Я\s]+$/.test(v) || "Тільки літери дозволені в імені",
+  (v) =>
+    /^[a-zA-Zа-яА-ЯєЄіІїЇ\s'’‘`-]+$/.test(v) ||
+    "Тільки літери дозволені в імені",
 ];
 
 export const emailRules = [
@@ -9,7 +11,7 @@ export const emailRules = [
 ];
 
 export const passwordRules = [
-  (v) => !!v || "Пароль обовязковий",
+  (v) => !!v || "Пароль обов'язковий",
   (v) => v.length >= 8 || "Пароль повинен бути більше ніж 8 символів",
   (v) =>
     /[A-Z]/.test(v) || "Пароль повинен містити принаймні одну велику літеру",
@@ -21,6 +23,6 @@ export const passwordRules = [
 ];
 
 export const confirmPasswordRules = (password) => [
-  (v) => !!v || "Підвердіть пароль",
+  (v) => !!v || "Підтвердіть пароль",
   (v) => v === password || "Паролі не співпадають",
 ];
