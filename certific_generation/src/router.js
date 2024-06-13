@@ -3,7 +3,6 @@ import Login from "./components/Login.vue";
 import SignUp from "./components/SignUp.vue";
 import TeacherPage from "./components/TeacherPage.vue";
 import StudentPage from "./components/StudentPage.vue";
-import CustomTable from "./components/CustomTable.vue";
 import GenerateCertificate from "./components/GenerateCertificate.vue";
 import CreateCertificate from "./components/createCertificate.vue";
 
