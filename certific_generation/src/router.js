@@ -21,11 +21,6 @@ const routes = [
     meta: { requiresAuth: true, role: "student" },
   },
   {
-    path: "/table",
-    component: CustomTable,
-    meta: { requiresAuth: true, role: "teacher" },
-  },
-  {
     path: "/certificate",
     component: GenerateCertificate,
     meta: { requiresAuth: true, role: "teacher" },
