@@ -285,7 +285,10 @@ app.post(
         date_is_centered,
       });
       await newTemplate.save();
-      res.status(200).json({ message: "Дані успішно збережено", image });
+      res.status(200).json({
+        message: "Дані успішно збережено",
+        image,
+      });
     } catch (error) {
       console.error("Помилка збереження даних:", error);
       res.status(500).json({ error: "Помилка сервера" });
@@ -341,6 +344,11 @@ app.post(
             teacherName_is_centred: template.teacherName_is_centred,
             studentName_is_centred: template.studentName_is_centred,
             date_is_centered: template.date_is_centered,
+            title_color: template.title_color,
+            duration_color: template.duration_color,
+            teacherSurname_color: template.teacherSurname_color,
+            studentName_color: template.studentName_color,
+            dateOfGiving_color: template.dateOfGiving_color,
           };
 
           const center = "transform: translateX(-50%);";
@@ -447,7 +455,7 @@ app.post(
               teacherSurname: CertData.teacherSurname,
               dateOfGiving: CertData.dateOfGiving,
             });
-            //await newCertificate.save();
+            await newCertificate.save();
             sertificates.push(base64Image);
             studentsCnt--;
             if (studentsCnt <= 0) {

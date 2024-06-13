@@ -51,20 +51,20 @@
         <div class="checkbox-container" v-if="image">
           <div class="center-text">Центрувати:</div>
           <label class="custom-checkbox">
-            <input type="checkbox" v-model="title_is_centred" />
-            <span class="checkbox-label">Подія</span>
+            <input type="checkbox" v-model="studentName_is_centred" />
+            <span class="checkbox-label">Студент</span>
           </label>
           <label class="custom-checkbox">
-            <input type="checkbox" v-model="duration_is_centred" />
-            <span class="checkbox-label">Тривалість</span>
+            <input type="checkbox" v-model="title_is_centred" />
+            <span class="checkbox-label">Подія</span>
           </label>
           <label class="custom-checkbox">
             <input type="checkbox" v-model="teacherName_is_centred" />
             <span class="checkbox-label">Викладач</span>
           </label>
           <label class="custom-checkbox">
-            <input type="checkbox" v-model="studentName_is_centred" />
-            <span class="checkbox-label">Студент</span>
+            <input type="checkbox" v-model="duration_is_centred" />
+            <span class="checkbox-label">Тривалість</span>
           </label>
           <label class="custom-checkbox">
             <input type="checkbox" v-model="date_is_centered" />
@@ -106,6 +106,19 @@
         </button>
       </div>
     </form>
+    <v-snackbar
+      v-model="showSnackbar"
+      :timeout="snackbarTimeout"
+      top
+      color="green"
+    >
+      {{ snackbarMessage }}
+      <template v-slot:action="{ attrs }">
+        <v-btn color="white" text v-bind="attrs" @click="showSnackbar = false">
+          Закрити
+        </v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
 
@@ -147,6 +160,9 @@ export default {
       studentName_is_centred: false,
       date_is_centered: false,
       widthScaleImage: 0,
+      showSnackbar: false,
+      snackbarTimeout: 1000,
+      snackbarMessage: "Шаблон успішно збережено",
     };
   },
   components: {
@@ -313,8 +329,10 @@ export default {
       });
 
       console.log(response.data);
-      alert("Успішно збережено");
-      this.$router.push("/certificate");
+      this.showSnackbar = true;
+      setTimeout(() => {
+        this.$router.push("/certificate");
+      }, 1500);
     },
 
     handleResize() {

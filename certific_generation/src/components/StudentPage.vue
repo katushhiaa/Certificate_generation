@@ -1,6 +1,10 @@
 <template>
   <div class="carousel">
-    <Carousel @slide-start="handleSlideStart" @init="handleInit">
+    <Carousel
+      @slide-start="handleSlideStart"
+      @init="handleInit"
+      v-if="certificates && certificates.length > 0"
+    >
       <Slide v-for="(certificate, idx) in certificates" :key="idx">
         <div class="carousel__item">
           <img
@@ -14,7 +18,10 @@
         <Pagination />
       </template>
     </Carousel>
-    <div class="input-box button">
+    <div
+      class="input-box button"
+      v-if="certificates && certificates.length > 0"
+    >
       <button
         @click="printCertificate"
         style="width: 250px; height: 50px; margin: 10px"
@@ -25,12 +32,14 @@
         @click="downloadPDF"
         style="width: 250px; height: 50px; margin: 10px"
       >
-        Завантажити в ПДФ
+        Завантажити в PDF
       </button>
+    </div>
+    <div v-if="!certificates || certificates.length === 0">
+      У вас ще немає сертифікатів
     </div>
   </div>
 </template>
-
 <script>
 import Network from "@/Network";
 import { Carousel, Navigation, Pagination, Slide } from "vue3-carousel";

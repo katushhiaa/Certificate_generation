@@ -1,6 +1,9 @@
 <template>
   <div class="final_wrapper">
-    <div v-if="hasTemplates()" class="carousel-wrapper">
+    <div v-if="isPageLoading">
+      <span>Зачекайте...</span>
+    </div>
+    <div v-else-if="hasTemplates()" class="carousel-wrapper">
       <div class="carousel">
         <Carousel @slide-start="handleSlideStart" @init="handleInit">
           <Slide v-for="template in templates" :key="template.image">
@@ -49,28 +52,23 @@
           @click="downloadPDF"
           style="width: 250px; height: 50px; margin: 10px"
         >
-          Завантажити в ПДФ
+          Завантажити в PDF
         </button>
       </div>
-      <ul class="generated-sertificats" style="width: 100vw; padding: 0">
+      <ul class="generated-certificats">
         <li v-for="(image, idx) in generatedSerts" :key="idx">
-          <img
-            :src="'data:image/png;base64,' + image"
-            alt="Template"
-            style="width: 100vw"
-          />
+          <img :src="'data:image/png;base64,' + image" alt="Template" />
         </li>
       </ul>
     </div>
-    <div v-if="!hasTemplates()">
+    <div v-else class="input-box button">
       <button
         @click="createNewCertificate"
         style="width: 250px; height: 50px; margin: 10px"
       >
-        Додати сертифікат
+        Додати шаблон
       </button>
     </div>
-    <div id="certificate" v-html="htmlTemplate"></div>
     <button
       type="button"
       @click="goBack"
@@ -105,6 +103,7 @@ export default defineComponent({
       selectedStudentsCount: 0,
       isLoading: false,
       isGenerated: false,
+      isPageLoading: true,
     };
   },
   created() {
@@ -153,9 +152,11 @@ export default defineComponent({
     },
     async fetchTemplates() {
       try {
+        this.isPageLoading = true;
         const userId = localStorage.getItem("userId");
         const response = await Network.getTemplates({ userId });
         this.templates = response.data;
+        this.isPageLoading = false;
       } catch (error) {
         console.error("Error fetching templates:", error);
       }
@@ -243,7 +244,7 @@ export default defineComponent({
   margin: -50px 10px 0 0;
 }
 
-.generated-sertificats {
+.generated-certificats {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -252,11 +253,10 @@ export default defineComponent({
   gap: 10px;
 }
 
-.generated-sertificats li {
+.generated-certificats li {
   margin: 0;
   padding: 0;
   list-style: none;
-  width: 100vw;
 }
 
 .input-box.button button.generate-button:disabled {
@@ -277,6 +277,10 @@ export default defineComponent({
 @media (max-width: 767px) {
   .back-button {
     top: 50px;
+  }
+  .generated-certificats img {
+    width: 100vw;
+    padding: 0;
   }
 }
 </style>

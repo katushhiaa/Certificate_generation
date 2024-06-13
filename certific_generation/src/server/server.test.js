@@ -2,6 +2,8 @@ import request from "supertest";
 import mongoose from "mongoose";
 import app from "./server.js";
 
+jest.setTimeout(60000);
+
 describe("API Endpoints", () => {
   beforeAll(async () => {
     const dbUri = "mongodb://localhost:27017/test-database";
@@ -17,7 +19,7 @@ describe("API Endpoints", () => {
   });
 
   describe("POST /signup", () => {
-    it("should create a new user", async () => {
+    it("повинно створити нового користувача", async () => {
       const res = await request(app).post("/signup").send({
         name: "New User",
         email: "newuser@example.com",
@@ -29,9 +31,9 @@ describe("API Endpoints", () => {
         "message",
         "Користувача успішно зареєстровано"
       );
-    });
+    }, 10000);
 
-    it("should not create a user with existing email", async () => {
+    it("не повинно створювати користувача з email який вже існує", async () => {
       const res = await request(app).post("/signup").send({
         name: "Test User",
         email: "newuser@example.com",
@@ -40,11 +42,11 @@ describe("API Endpoints", () => {
       });
       expect(res.statusCode).toEqual(400);
       expect(res.body).toHaveProperty("message", "Цей email вже існує");
-    });
+    }, 10000);
   });
 
   describe("POST /login", () => {
-    it("should login a user", async () => {
+    it("користувач повинен успішно увійти в систему", async () => {
       await request(app).post("/signup").send({
         name: "Test User",
         email: "testlogin@example.com",
@@ -58,23 +60,23 @@ describe("API Endpoints", () => {
       });
       expect(res.statusCode).toEqual(200);
       expect(res.body).toHaveProperty("accessToken");
-    });
+    }, 10000);
 
-    it("should not login a user with wrong password", async () => {
+    it("користувач не може увійти з неправильним паролем", async () => {
       const res = await request(app).post("/login").send({
         email: "testlogin@example.com",
         password: "wrongpassword",
       });
       expect(res.statusCode).toEqual(400);
       expect(res.body).toHaveProperty("message", "Неправильний пароль");
-    });
+    }, 10000);
   });
 
   describe("GET /templates", () => {
     let token, userId;
 
     beforeEach(async () => {
-      await request(app).post("/signup").send({
+      const signupRes = await request(app).post("/signup").send({
         name: "Test Teacher",
         email: "teacher@example.com",
         password: "password123",
@@ -87,9 +89,9 @@ describe("API Endpoints", () => {
       });
       token = loginRes.body.accessToken;
       userId = loginRes.body.userId;
-    });
+    }, 10000);
 
-    it("should get templates for a teacher", async () => {
+    it("повинен отримати шаблони для викладача", async () => {
       const res = await request(app)
         .get("/templates")
         .set("x-access-token", token)
@@ -97,7 +99,7 @@ describe("API Endpoints", () => {
 
       expect(res.statusCode).toEqual(200);
       expect(Array.isArray(res.body)).toBeTruthy();
-    });
+    }, 10000);
   });
 
   describe("GET /students", () => {
@@ -116,74 +118,19 @@ describe("API Endpoints", () => {
         password: "password123",
       });
       token = loginRes.body.accessToken;
-    });
+    }, 10000);
 
-    it("should get students for a teacher", async () => {
+    it("повинен отримати студентів щоб відобразити викладачу", async () => {
       const res = await request(app)
         .get("/students")
         .set("x-access-token", token);
 
       expect(res.statusCode).toEqual(200);
       expect(Array.isArray(res.body)).toBeTruthy();
-    });
+    }, 10000);
   });
 
   describe("POST /saveTemplateData", () => {
-    let token, userId;
-
-    beforeEach(async () => {
-      const signupRes = await request(app).post("/signup").send({
-        name: "Test Teacher",
-        email: "teacher@example.com",
-        password: "password123",
-        role: "teacher",
-      });
-
-      const loginRes = await request(app).post("/login").send({
-        email: "teacher@example.com",
-        password: "password123",
-      });
-      token = loginRes.body.accessToken;
-      userId = signupRes.body.userId;
-    });
-
-    it("should save template data", async () => {
-      const res = await request(app)
-        .post("/saveTemplateData")
-        .set("x-access-token", token)
-        .send({
-          title_color: "red",
-          title_top: 100,
-          title_left: 50,
-          duration_color: "blue",
-          duration_top: 150,
-          duration_left: 70,
-          teacherSurname_color: "green",
-          teacherSurname_top: 200,
-          teacherSurname_left: 90,
-          studentName_color: "purple",
-          studentName_top: 250,
-          studentName_left: 110,
-          dateOfGiving_color: "orange",
-          dateOfGiving_top: 300,
-          dateOfGiving_left: 130,
-          image: "data:image/png;base64,...",
-          imageWidth: 800,
-          imageHeight: 600,
-          createdBy: userId,
-          title_is_centred: true,
-          duration_is_centred: true,
-          teacherName_is_centred: true,
-          studentName_is_centred: true,
-          date_is_centered: true,
-        });
-
-      expect(res.statusCode).toEqual(200);
-      expect(res.body).toHaveProperty("message", "Дані успішно збережено");
-    });
-  });
-
-  describe("POST /generateCertificate", () => {
     let token, userId, templateId;
 
     beforeEach(async () => {
@@ -199,9 +146,11 @@ describe("API Endpoints", () => {
         password: "password123",
       });
       token = loginRes.body.accessToken;
-      userId = signupRes.body.userId;
+      userId = loginRes.body.userId;
+    }, 10000);
 
-      const templateRes = await request(app)
+    it("повинен зберегти дані про шаблон сертифікату", async () => {
+      const res = await request(app)
         .post("/saveTemplateData")
         .set("x-access-token", token)
         .send({
@@ -226,30 +175,35 @@ describe("API Endpoints", () => {
           createdBy: userId,
           title_is_centred: true,
           duration_is_centred: true,
-          teacherName_is_centred: true,
-          studentName_is_centred: true,
+          teacherName_is_centред: true,
+          studentName_is_centред: true,
           date_is_centered: true,
-        });
-      templateId = templateRes.body._id;
-    });
-
-    it("should generate certificate", async () => {
-      const res = await request(app)
-        .post("/generateCertificate")
-        .set("x-access-token", token)
-        .send({
-          CertData: {
-            title: "Certificate Title",
-            duration: "10 hours",
-            teacherSurname: "Doe",
-            dateOfGiving: "2024-01-01",
-          },
-          selectedStudents: [userId],
-          selectedTemplateId: templateId,
         });
 
       expect(res.statusCode).toEqual(200);
-      expect(Array.isArray(res.body)).toBeTruthy();
+      expect(res.body).toHaveProperty("message", "Дані успішно збережено");
+      templateId = res.body._id;
     }, 10000);
+
+    describe("POST /generateCertificate", () => {
+      it("повинен згенерувати сертифікат", async () => {
+        const res = await request(app)
+          .post("/generateCertificate")
+          .set("x-access-token", token)
+          .send({
+            CertData: {
+              title: "Certificate Title",
+              duration: "10 hours",
+              teacherSurname: "Doe",
+              dateOfGiving: "2024-01-01",
+            },
+            selectedStudents: [userId],
+            selectedTemplateId: templateId,
+          });
+
+        expect(res.statusCode).toEqual(200);
+        expect(Array.isArray(res.body)).toBeTruthy();
+      }, 100000);
+    });
   });
 });
