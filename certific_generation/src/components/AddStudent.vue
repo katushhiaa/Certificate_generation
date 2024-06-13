@@ -20,7 +20,7 @@
         <v-text-field
           v-model="password"
           :rules="passwordRules"
-          label="Створіть пароль"
+          label="Створіть йому пароль"
           type="password"
           required
         ></v-text-field>
