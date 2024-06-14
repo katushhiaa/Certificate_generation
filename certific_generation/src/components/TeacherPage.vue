@@ -5,18 +5,24 @@
         <div class="col-md-6">
           <div class="teacherContainer">
             <div class="students-container">
-              <v-data-table
+              <v-text-field
+                v-model="searchQuery"
+                label="Пошук студентів"
+                class="mb-4 custom-search-field"
+              ></v-text-field>
+              <v-data-table-virtual
                 ref="selectableTable"
                 v-model="selectedStudents"
                 :headers="headers"
-                :items="students"
+                :items="filteredStudents"
                 item-key="id"
                 select-all
                 show-select
-                :pagination="true"
+                :search="searchQuery"
                 @input="updateSelectedStudents"
                 class="custom-data-table"
-              ></v-data-table>
+                height="300"
+              ></v-data-table-virtual>
               <AddStudent></AddStudent>
             </div>
           </div>
@@ -28,7 +34,7 @@
               <v-text-field
                 v-model="data.title"
                 :rules="titleRules"
-                label="Назва заходу (участь в)"
+                label="Назва заходу"
                 required
               ></v-text-field>
               <v-text-field
@@ -120,13 +126,23 @@ export default {
       durationRules,
       teacherSurnameRules,
       dateOfGivingRules,
-
       isCertDataSaved: false,
+      searchQuery: "",
     };
   },
   async mounted() {
     await this.fetchStudents();
     this.checkCertDataInLocalStorage();
+  },
+  computed: {
+    filteredStudents() {
+      if (!this.searchQuery) {
+        return this.students;
+      }
+      return this.students.filter((student) =>
+        student.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    },
   },
   methods: {
     async fetchStudents() {
@@ -137,7 +153,6 @@ export default {
           id: student._id,
           name: student.name,
         }));
-        console.log(this.students);
       } catch (error) {
         console.error("Error fetching student data:", error);
       } finally {
@@ -164,8 +179,6 @@ export default {
     async submitCertForm() {
       const form = this.$refs.certForm;
       if (form && form.validate() && this.selectedStudents.length > 0) {
-        console.log("Form submitted with data:", this.data);
-        console.log(this.selectedStudents);
         if (localStorage) {
           localStorage.setItem("CertData", JSON.stringify(this.data));
           localStorage.setItem(
@@ -181,7 +194,6 @@ export default {
         this.snackbarMessage =
           "Форма не повинна відправлятись пустою, і повинен бути хоча б один обраний студент";
         this.showSnackbar = true;
-        console.log("Form is not valid or no students selected");
       }
     },
     redirectToTemplateChoose() {
@@ -231,6 +243,10 @@ export default {
   font-size: 16px;
   cursor: pointer;
   border: none;
+}
+
+.custom-search-field >>> .v-input__control {
+  background-color: #f5f5f5 !important;
 }
 
 @media (max-width: 767px) {

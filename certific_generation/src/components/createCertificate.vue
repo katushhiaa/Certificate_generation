@@ -39,7 +39,7 @@
             @changeColor="changeColorForAllWords($event)"
             @inputFocus="inputFocus"
             @inputBlur="inputBlur"
-            style="width: 220px; height: 300px"
+            style="width: 220px; height: 335px"
           />
 
           <div v-if="isDesctop && image" class="save-button">
@@ -188,10 +188,8 @@ export default {
   methods: {
     getScaledImageWidth() {
       const imageElement = this.$refs.templateImage;
-      console.log(imageElement);
       if (imageElement) {
         this.widthScaleImage = imageElement.offsetWidth;
-        console.log("Image Width: ", this.widthScaleImage);
       }
     },
     startDrag(index, event) {
@@ -217,9 +215,7 @@ export default {
         const image = new Image();
         image.onload = () => {
           this.imageWidth = image.width;
-          console.log(this.imageWidth);
           this.imageHeight = image.height;
-          console.log(this.imageHeight);
         };
         image.src = event.target.result;
       };
@@ -234,16 +230,6 @@ export default {
           const touch = event.touches[0];
           this.words[this.currentWordIndex].top = touch.clientY - this.offsetY;
           this.words[this.currentWordIndex].left = touch.clientX - this.offsetX;
-          console.log(
-            "Top: ",
-            (this.words[this.currentWordIndex].top =
-              touch.clientY - this.offsetY)
-          );
-          console.log(
-            "Left: ",
-            (this.words[this.currentWordIndex].left =
-              touch.clientX - this.offsetX)
-          );
         }
         this.words[this.currentWordIndex].width = event.target.offsetWidth;
       }
@@ -327,8 +313,6 @@ export default {
         studentName_is_centred: this.studentName_is_centred,
         date_is_centered: this.date_is_centered,
       });
-
-      console.log(response.data);
       this.showSnackbar = true;
       setTimeout(() => {
         this.$router.push("/certificate");

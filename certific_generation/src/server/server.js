@@ -36,7 +36,6 @@ db.once("open", () => {
 
 const checkToken = (req, res, next) => {
   let token = req.headers["x-access-token"];
-  console.log(token);
 
   if (!token) {
     return res.status(403).send({ message: "No token provided!" });
@@ -162,7 +161,7 @@ app.post("/signup", async (req, res) => {
     const existingUser = await User.findOne({ email: email });
     if (existingUser) {
       console.error("Email already exists:", email);
-      return res.status(400).json({ message: "Цей email вже існує" });
+      return res.status(400).json({ message: "Цей користувач вже існує" });
     } else {
       const hashedPassword = await bcrypt.hash(password, 10);
       const newUser = new User({ name, email, password: hashedPassword, role });
@@ -198,7 +197,6 @@ app.post("/login", async (req, res) => {
           allowInsecureKeySizes: true,
           expiresIn: 86400,
         });
-        console.log(token);
         res.status(200).json({
           accessToken: token,
           userId: user._id,
@@ -322,7 +320,6 @@ app.post(
         const targetWidth = 1200;
         const scaleFactor = template.imageWidth / targetWidth;
         selectedStudents.forEach((student) => {
-          console.log(`Creating the certificate for ${student.name}`);
           const certNumber = `CERT-${Date.now()}-${Math.floor(
             Math.random() * 1000
           )}`;
@@ -442,9 +439,6 @@ app.post(
             encoding: "buffer",
           }).then(async (imageBuffer) => {
             const base64Image = imageBuffer.toString("base64");
-            console.log(
-              `The image for ${student.name} was created successfully!`
-            );
             const newCertificate = new Certificate({
               studentId: student.id,
               templateId: template.id,
@@ -476,7 +470,6 @@ app.get(
   async (req, res) => {
     try {
       const student = req.query.userId;
-      console.log(student);
       const studentCertificates = await Certificate.find({
         studentId: student,
       });

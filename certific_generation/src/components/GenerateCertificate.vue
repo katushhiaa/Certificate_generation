@@ -164,8 +164,6 @@ export default defineComponent({
     async selectTemplate(template) {
       try {
         this.selectedTempate = template._id;
-
-        console.log("Selected template ID:", template._id);
       } catch (error) {
         console.error("Error selecting template:", error);
       }
@@ -198,7 +196,6 @@ export default defineComponent({
           selectedTemplateId: this.selectedTempate,
           CertData,
         });
-        console.log(response.data);
 
         this.generatedSerts = response.data;
         this.isLoading = false;

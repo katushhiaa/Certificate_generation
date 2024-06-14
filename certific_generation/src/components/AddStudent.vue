@@ -30,6 +30,19 @@
         </div>
       </form>
     </b-modal>
+    <v-snackbar
+      v-model="showSnackbar"
+      :timeout="snackbarTimeout"
+      top
+      color="red"
+    >
+      {{ snackbarMessage }}
+      <template v-slot:action="{ attrs }">
+        <v-btn color="white" text v-bind="attrs" @click="showSnackbar = false">
+          Закрити
+        </v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
 
@@ -48,6 +61,9 @@ export default {
       nameRules,
       emailRules,
       passwordRules,
+      showSnackbar: false,
+      snackbarMessage: "",
+      snackbarTimeout: 6000,
     };
   },
   methods: {
@@ -61,8 +77,16 @@ export default {
         });
         if (response.status === 201) {
           this.modalShow = false;
+          window.location.reload();
         }
       } catch (error) {
+        if (error.response && error.response.status === 400) {
+          this.snackbarMessage = error.response.data.message;
+        } else {
+          this.snackbarMessage =
+            "Помилка під час реєстрації. Спробуйте ще раз.";
+        }
+        this.showSnackbar = true;
         console.error("Error during registration:", error);
       }
     },

@@ -58,6 +58,15 @@ export default {
   },
   mounted() {
     this.checkAuthentication();
+    window.addEventListener("beforeunload", this.handleBeforeUnload);
+    if (sessionStorage.getItem("isReloading") === "true") {
+      sessionStorage.setItem("isReloading", "false");
+    } else {
+      this.clearLocalStorage();
+    }
+  },
+  beforeDestroy() {
+    window.removeEventListener("beforeunload", this.handleBeforeUnload);
   },
   methods: {
     checkAuthentication() {
@@ -79,14 +88,20 @@ export default {
       this.$router.push("/signup");
     },
     logout() {
+      this.clearLocalStorage();
+      this.isAuthenticated = false;
+      this.$router.push("/login");
+    },
+    clearLocalStorage() {
       localStorage.removeItem("userId");
       localStorage.removeItem("role");
       localStorage.removeItem("name");
       localStorage.removeItem("user");
       localStorage.removeItem("CertData");
       localStorage.removeItem("selectedStudents");
-      this.isAuthenticated = false;
-      this.$router.push("/login");
+    },
+    handleBeforeUnload(event) {
+      sessionStorage.setItem("isReloading", "true");
     },
   },
   watch: {

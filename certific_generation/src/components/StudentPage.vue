@@ -74,7 +74,6 @@ export default {
     async selectCert(certificate) {
       try {
         this.currentCertificate = certificate;
-        console.log("Selected certificate:", certificate);
       } catch (error) {
         console.error("Error selecting certificate:", error);
       }
